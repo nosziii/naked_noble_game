@@ -1,0 +1,1310 @@
+﻿<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>Naked Noble – Sweet Spin</title>
+
+  <!-- Google Fonts: DM Serif Display & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      /* Brand */
+      --color-primary: #173D36;
+      --color-primary-hover: #24564B;
+      --color-background: #FFF8EF;
+      --color-surface: #F5EBDD;
+      --color-surface-white: #FFFFFF;
+
+      /* Accent */
+      --color-rose: #D98F9D;
+      --color-rose-dark: #9E5E6B;
+      --color-apricot: #F4AD83;
+      --color-gold: #E8B951;
+      --color-sage: #B7C5AC;
+
+      /* Typography */
+      --color-text: #173D36;
+      --color-text-secondary: #615A54;
+      --color-text-inverse: #FFFFFF;
+
+      /* UI */
+      --color-border: #E9DDD0;
+      --color-slot-muted: #E7DDD0;
+      --color-slot-icon: #B3A798;
+      --color-overlay: rgba(18, 40, 35, 0.68);
+      --color-win: #D4A53D;
+
+      /* Shape */
+      --radius-sm: 12px;
+      --radius-md: 18px;
+      --radius-lg: 28px;
+      --radius-pill: 999px;
+
+      /* Elevation */
+      --shadow-card: 0 8px 28px rgba(38, 48, 39, 0.08);
+      --shadow-card-hover: 0 14px 34px rgba(38, 48, 39, 0.12);
+      --shadow-win-glow: 0 0 0 2px var(--color-gold), 0 12px 36px rgba(232, 185, 81, 0.38);
+      --shadow-button: 0 10px 24px rgba(23, 61, 54, 0.2);
+      --shadow-modal: 0 24px 80px rgba(22, 42, 35, 0.24);
+
+      /* Motion */
+      --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+      --ease-spring: cubic-bezier(0.22, 1.12, 0.36, 1);
+      --duration-fast: 180ms;
+      --duration-normal: 300ms;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      background-color: var(--color-background);
+      color: var(--color-text);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Subtle organic background ambient blobs */
+    body::before,
+    body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(70px);
+      opacity: 0.35;
+    }
+    body::before {
+      width: 420px;
+      height: 420px;
+      background: radial-gradient(circle, var(--color-rose) 0%, transparent 70%);
+      top: -140px;
+      left: -120px;
+    }
+    body::after {
+      width: 460px;
+      height: 460px;
+      background: radial-gradient(circle, var(--color-apricot) 0%, transparent 70%);
+      bottom: -160px;
+      right: -120px;
+    }
+
+    /* Main Responsive App Shell */
+    .app-shell {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 1320px;
+      height: 100dvh;
+      margin: 0 auto;
+      padding: clamp(12px, 2.2vh, 28px) clamp(16px, 3vw, 44px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Top Navigation Bar */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .brand-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--color-primary);
+      color: var(--color-text-inverse);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 11px 22px;
+      border-radius: var(--radius-pill);
+      box-shadow: 0 4px 14px rgba(23, 61, 54, 0.14);
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .icon-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: var(--radius-pill);
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      color: var(--color-primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color var(--duration-fast) var(--ease-out),
+                  transform var(--duration-fast) var(--ease-out);
+    }
+
+    .icon-btn:hover {
+      background-color: #ECE0CE;
+      transform: translateY(-1px);
+    }
+
+    .icon-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* Editorial Header Section */
+    .hero-header {
+      text-align: center;
+      flex-shrink: 0;
+      margin: clamp(2px, 1vh, 12px) 0 clamp(6px, 1.5vh, 16px);
+    }
+
+    .hero-kicker {
+      font-size: clamp(11px, 1.2vw, 13px);
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-rose-dark);
+      margin-bottom: 4px;
+    }
+
+    .hero-title {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: clamp(30px, 4.2vw, 50px);
+      font-weight: 400;
+      line-height: 1.1;
+      color: var(--color-primary);
+      margin-bottom: 6px;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(13px, 1.4vw, 16px);
+      font-weight: 400;
+      color: var(--color-text-secondary);
+    }
+
+    /* Main Game Panel (#F5EBDD, 28px radius) */
+    .game-board {
+      background-color: var(--color-surface);
+      border-radius: var(--radius-lg);
+      padding: clamp(12px, 2vh, 22px) clamp(12px, 2vw, 24px);
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--color-border);
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: clamp(10px, 1.6vh, 16px);
+    }
+
+    /* Top & Bottom Muted Context Rows (Gift Placeholders) */
+    .context-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: clamp(10px, 1.8vw, 20px);
+      height: clamp(42px, 6.8vh, 66px);
+      flex-shrink: 0;
+    }
+
+    .context-slot {
+      background-color: var(--color-slot-muted);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-slot-icon);
+      transition: opacity var(--duration-normal) var(--ease-out),
+                  transform var(--duration-normal) var(--ease-out);
+    }
+
+    .context-slot svg {
+      width: clamp(20px, 2.5vh, 26px);
+      height: clamp(20px, 2.5vh, 26px);
+      stroke-width: 1.75;
+    }
+
+    .is-spinning .context-slot {
+      opacity: 0.65;
+      transform: scale(0.985);
+    }
+
+    /* Center Active Product Reels Row */
+    .reels-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: clamp(10px, 1.8vw, 20px);
+      flex: 1;
+      min-height: 0;
+    }
+
+    /* Individual Product Reel Card */
+    .product-card {
+      position: relative;
+      background-color: var(--color-surface-white);
+      border-radius: var(--radius-md);
+      border: 1.5px solid var(--color-gold);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+      height: 100%;
+      transition: transform var(--duration-normal) var(--ease-out),
+                  box-shadow var(--duration-normal) var(--ease-out),
+                  border-color var(--duration-normal) var(--ease-out);
+    }
+
+    .product-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-card-hover);
+    }
+
+    /* Winning Golden Flash & Shimmer on Center Cards (Phase 1) */
+    .product-card.winning-card {
+      border: 2px solid var(--color-gold);
+      box-shadow: var(--shadow-win-glow);
+      transform: translateY(-3px);
+    }
+
+    .product-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        115deg,
+        transparent 20%,
+        rgba(255, 255, 255, 0.75) 45%,
+        rgba(232, 185, 81, 0.35) 50%,
+        transparent 75%
+      );
+      transform: translateX(-130%);
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .product-card.winning-card::after {
+      animation: cardShimmer 750ms var(--ease-out) forwards;
+    }
+
+    @keyframes cardShimmer {
+      0% { transform: translateX(-130%); }
+      100% { transform: translateX(130%); }
+    }
+
+    /* Vertical Reel Strip inside each Product Card */
+    .reel-strip {
+      width: 100%;
+      will-change: transform, filter;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .reel-strip.motion-blur {
+      filter: blur(2px);
+    }
+
+    .reel-item {
+      width: 100%;
+      flex-shrink: 0;
+      padding: clamp(10px, 1.8vh, 18px) clamp(10px, 1.5vw, 18px) clamp(8px, 1.4vh, 14px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Inner Soft Frame for Product Image */
+    .product-image-frame {
+      width: 100%;
+      flex: 1;
+      min-height: 0;
+      background-color: #F8F6F2;
+      border: 1px solid #F0EAE1;
+      border-radius: 14px;
+      padding: clamp(8px, 1.5vh, 16px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .product-image-frame img {
+      max-width: 92%;
+      max-height: 92%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      transition: transform var(--duration-normal) var(--ease-out);
+      filter: drop-shadow(0 6px 14px rgba(38, 48, 39, 0.08));
+    }
+
+    .product-card:hover .product-image-frame img {
+      transform: scale(1.03);
+    }
+
+    .product-name {
+      margin-top: clamp(6px, 1.2vh, 12px);
+      font-size: clamp(13px, 1.2vw, 16px);
+      font-weight: 600;
+      color: var(--color-primary);
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+      flex-shrink: 0;
+    }
+
+    /* Bottom CTA Area */
+    .cta-section {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: clamp(10px, 1.8vh, 20px);
+    }
+
+    .spin-button {
+      width: 100%;
+      max-width: 860px;
+      height: clamp(50px, 6.8vh, 64px);
+      border-radius: var(--radius-pill);
+      background-color: var(--color-primary);
+      color: var(--color-text-inverse);
+      border: none;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(15px, 1.4vw, 17px);
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      cursor: pointer;
+      box-shadow: var(--shadow-button);
+      transition: background-color var(--duration-fast) var(--ease-out),
+                  transform var(--duration-fast) var(--ease-out),
+                  box-shadow var(--duration-fast) var(--ease-out);
+    }
+
+    .spin-button:hover:not(:disabled) {
+      background-color: var(--color-primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px rgba(23, 61, 54, 0.25);
+    }
+
+    .spin-button:active:not(:disabled),
+    .spin-button.pressed {
+      transform: scale(0.975);
+    }
+
+    .spin-button:disabled {
+      opacity: 0.78;
+      cursor: default;
+    }
+
+    .spin-helper {
+      margin-top: clamp(6px, 1vh, 10px);
+      font-size: clamp(12px, 1.1vw, 14px);
+      font-weight: 400;
+      color: var(--color-text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* Winner Modal Overlay (Phase 2 & 3) */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background-color: var(--color-overlay);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--duration-normal) var(--ease-out);
+    }
+
+    .modal-overlay.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Subtle Restrained Confetti Layer (6-10 elements) */
+    .subtle-confetti-container {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 51;
+      overflow: hidden;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      opacity: 0;
+      will-change: transform, opacity;
+    }
+
+    /* Winner Modal Card (#FFF8EF, 28px radius) */
+    .winner-modal-card {
+      position: relative;
+      z-index: 52;
+      width: 100%;
+      max-width: 780px;
+      background-color: var(--color-background);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-modal);
+      padding: clamp(24px, 4vh, 42px) clamp(20px, 4vw, 48px);
+      text-align: center;
+      transform: scale(0.94) translateY(10px);
+      transition: transform 320ms var(--ease-out);
+    }
+
+    .modal-overlay.is-open .winner-modal-card {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-rose-dark);
+      margin-bottom: 6px;
+    }
+
+    .modal-title {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: clamp(32px, 4vw, 44px);
+      font-weight: 400;
+      color: var(--color-primary);
+      line-height: 1.12;
+      margin-bottom: 6px;
+    }
+
+    .modal-subtitle {
+      font-size: clamp(14px, 1.4vw, 16px);
+      color: var(--color-text-secondary);
+      margin-bottom: clamp(16px, 2.5vh, 24px);
+    }
+
+    /* Inner White Prize Showcase Box */
+    .modal-prize-box {
+      background-color: var(--color-surface-white);
+      border: 1px solid var(--color-border);
+      border-radius: 22px;
+      padding: clamp(18px, 3vh, 28px);
+      margin: 0 auto clamp(18px, 3vh, 28px);
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(38, 48, 39, 0.04);
+    }
+
+    .modal-image-square {
+      width: clamp(150px, 22vh, 200px);
+      height: clamp(150px, 22vh, 200px);
+      background-color: var(--color-surface-white);
+      border: 1px solid #EFE8DC;
+      border-radius: var(--radius-md);
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .modal-image-square img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 8px 16px rgba(38, 48, 39, 0.12));
+    }
+
+    .modal-product-name {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: clamp(22px, 2.8vw, 30px);
+      font-weight: 400;
+      color: var(--color-primary);
+      margin-bottom: 10px;
+    }
+
+    .modal-category-pill {
+      display: inline-block;
+      background-color: var(--color-surface);
+      color: #382B2B;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 7px 18px;
+      border-radius: var(--radius-pill);
+    }
+
+    .modal-cta-btn {
+      width: 100%;
+      height: clamp(52px, 6.8vh, 62px);
+      border-radius: var(--radius-pill);
+      background-color: var(--color-primary);
+      color: var(--color-text-inverse);
+      border: none;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(15px, 1.4vw, 17px);
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      box-shadow: var(--shadow-button);
+      transition: background-color var(--duration-fast) var(--ease-out),
+                  transform var(--duration-fast) var(--ease-out);
+    }
+
+    .modal-cta-btn:hover {
+      background-color: var(--color-primary-hover);
+      transform: translateY(-2px);
+    }
+
+    .modal-cta-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* Info Popover Modal */
+    .info-modal-card {
+      position: relative;
+      z-index: 52;
+      width: 100%;
+      max-width: 520px;
+      background-color: var(--color-background);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-modal);
+      padding: 28px 32px;
+      text-align: left;
+    }
+
+    /* Responsive adjustments for smaller mobile screens */
+    @media (max-width: 640px) {
+      .app-shell {
+        padding: 12px 12px;
+      }
+      .game-board {
+        padding: 10px;
+        border-radius: 22px;
+      }
+      .reels-row,
+      .context-row {
+        gap: 8px;
+      }
+      .product-name {
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Main Application Container -->
+  <div class="app-shell">
+
+    <!-- Top Header Bar -->
+    <header class="top-bar">
+      <div class="brand-pill">NAKED NOBLE</div>
+
+      <div class="top-actions">
+        <!-- Sound Toggle Button -->
+        <button
+          id="sound-btn"
+          type="button"
+          class="icon-btn"
+          title="Hang be- és kikapcsolása"
+          aria-label="Hang be- és kikapcsolása"
+        >
+          <svg id="sound-on-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+          </svg>
+          <svg id="sound-off-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <line x1="23" y1="9" x2="17" y2="15"></line>
+            <line x1="17" y1="9" x2="23" y2="15"></line>
+          </svg>
+        </button>
+
+        <!-- Fullscreen Toggle Button -->
+        <button
+          id="fullscreen-btn"
+          type="button"
+          class="icon-btn"
+          title="Teljes képernyő"
+          aria-label="Teljes képernyő"
+        >
+          <svg id="fs-enter-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+          </svg>
+          <svg id="fs-exit-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+            <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path>
+          </svg>
+        </button>
+
+        <!-- Info / Rules Button (?) -->
+        <button
+          id="info-btn"
+          type="button"
+          class="icon-btn"
+          title="Játékszabály és nyeremények"
+          aria-label="Játékszabály és nyeremények"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Editorial Hero Title -->
+    <section class="hero-header">
+      <p class="hero-kicker">EGY KIS ÉDESSÉG, EGY NAGY MEGLEPETÉS</p>
+      <h1 class="hero-title">Pörgesd ki a szerencséd!</h1>
+      <p class="hero-subtitle">Találj három egyforma finomságot!</p>
+    </section>
+
+    <!-- Center Game Board (#F5EBDD) -->
+    <main id="game-board" class="game-board" aria-label="Naked Noble nyereményjáték">
+
+      <!-- Top Muted Context Row -->
+      <div class="context-row" aria-hidden="true">
+        <div class="context-slot">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 12 20 22 4 22 4 12"></polyline>
+            <rect x="2" y="7" width="20" height="5" rx="1"></rect>
+            <line x1="12" y1="22" x2="12" y2="7"></line>
+            <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path>
+            <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path>
+          </svg>
+        </div>
+        <div class="context-slot">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 12 20 22 4 22 4 12"></polyline>
+            <rect x="2" y="7" width="20" height="5" rx="1"></rect>
+            <line x1="12" y1="22" x2="12" y2="7"></line>
+            <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path>
+            <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path>
+          </svg>
+        </div>
+        <div class="context-slot">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 12 20 22 4 22 4 12"></polyline>
+            <rect x="2" y="7" width="20" height="5" rx="1"></rect>
+            <line x1="12" y1="22" x2="12" y2="7"></line>
+            <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path>
+            <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Center Row: 3 Large Product Reel Cards -->
+      <div class="reels-row">
+        <div id="card-0" class="product-card">
+          <div id="strip-0" class="reel-strip"></div>
+        </div>
+        <div id="card-1" class="product-card">
+          <div id="strip-1" class="reel-strip"></div>
+        </div>
+        <div id="card-2" class="product-card">
+          <div id="strip-2" class="reel-strip"></div>
+        </div>
+      </div>
+
+      <!-- Bottom Muted Context Row -->
+      <div class="context-row" aria-hidden="true">
+        <div class="context-slot">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 12 20 22 4 22 4 12"></polyline>
+            <rect x="2" y="7" width="20" height="5" rx="1"></rect>
+            <line x1="12" y1="22" x2="12" y2="7"></line>
+            <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path>
+            <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path>
+          </svg>
+        </div>
+        <div class="context-slot">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 12 20 22 4 22 4 12"></polyline>
+            <rect x="2" y="7" width="20" height="5" rx="1"></rect>
+            <line x1="12" y1="22" x2="12" y2="7"></line>
+            <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path>
+            <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path>
+          </svg>
+        </div>
+        <div class="context-slot">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 12 20 22 4 22 4 12"></polyline>
+            <rect x="2" y="7" width="20" height="5" rx="1"></rect>
+            <line x1="12" y1="22" x2="12" y2="7"></line>
+            <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path>
+            <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path>
+          </svg>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Primary Spin Button & Helper -->
+    <footer class="cta-section">
+      <button id="spin-btn" type="button" class="spin-button">
+        <!-- Gold Sparkle SVG -->
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E8B951" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3l1.9 5.8a2 2 0 0 0 1.3 1.3L21 12l-5.8 1.9a2 2 0 0 0-1.3 1.3L12 21l-1.9-5.8a2 2 0 0 0-1.3-1.3L3 12l5.8-1.9a2 2 0 0 0 1.3-1.3L12 3z"></path>
+          <path d="M5 3v4M3 5h4"></path>
+        </svg>
+        <span id="spin-btn-text">PÖRGETÉS</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </button>
+      <p class="spin-helper">
+        <span>Sok szerencsét!</span>
+        <span style="color: var(--color-gold);">✨</span>
+      </p>
+    </footer>
+
+  </div>
+
+  <!-- Subtle Restrained Confetti Layer (8-10 elements) -->
+  <div id="confetti-layer" class="subtle-confetti-container" aria-hidden="true"></div>
+
+  <!-- WINNER MODAL OVERLAY -->
+  <div
+    id="winner-modal"
+    class="modal-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-heading"
+  >
+    <div class="winner-modal-card">
+      <div class="modal-kicker">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D4A53D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3l1.9 5.8a2 2 0 0 0 1.3 1.3L21 12l-5.8 1.9a2 2 0 0 0-1.3 1.3L12 21l-1.9-5.8a2 2 0 0 0-1.3-1.3L3 12l5.8-1.9a2 2 0 0 0 1.3-1.3L12 3z"></path>
+        </svg>
+        <span>GRATULÁLUNK!</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D4A53D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3l1.9 5.8a2 2 0 0 0 1.3 1.3L21 12l-5.8 1.9a2 2 0 0 0-1.3 1.3L12 21l-1.9-5.8a2 2 0 0 0-1.3-1.3L3 12l5.8-1.9a2 2 0 0 0 1.3-1.3L12 3z"></path>
+        </svg>
+      </div>
+
+      <h2 id="modal-heading" class="modal-title">Ez édes siker!</h2>
+      <p class="modal-subtitle">Megnyerted az alábbi finomságot</p>
+
+      <!-- Showcase Card -->
+      <div class="modal-prize-box">
+        <div class="modal-image-square">
+          <img id="modal-prize-img" src="images/banankrem.png" alt="Megnyert termék" />
+        </div>
+        <h3 id="modal-prize-name" class="modal-product-name">Krémes finomság – Banánkrém</h3>
+        <span id="modal-prize-category" class="modal-category-pill">1. NYEREMÉNYKATEGÓRIA</span>
+      </div>
+
+      <!-- Next Player CTA -->
+      <button id="next-player-btn" type="button" class="modal-cta-btn">
+        <span>KÖVETKEZŐ JÁTÉKOS</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- INFO / PRIZE CATEGORIES MODAL -->
+  <div
+    id="info-modal"
+    class="modal-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="info-heading"
+  >
+    <div class="info-modal-card">
+      <h2 id="info-heading" class="modal-title" style="font-size: 28px; margin-bottom: 10px;">
+        Naked Noble – Sweet Spin
+      </h2>
+      <p style="font-size: 14px; color: var(--color-text-secondary); line-height: 1.6; margin-bottom: 18px;">
+        Pörgess a <strong>Pörgetés</strong> gombbal (vagy a <strong>Space / Enter</strong> billentyűvel)! Ha három egyforma finomság jelenik meg a középső sorban, máris a tiéd az ajándék.
+      </p>
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px;">
+        <div style="background: var(--color-surface); padding: 12px 16px; border-radius: 14px; font-size: 14px;">
+          <strong style="color: var(--color-primary);">1. Nyereménykategória:</strong> Krémes finomság (Banánkrém, Eperkrém, Kókuszos mandulakrém)
+        </div>
+        <div style="background: var(--color-surface); padding: 12px 16px; border-radius: 14px; font-size: 14px;">
+          <strong style="color: var(--color-primary);">2. Nyereménykategória:</strong> Ropogós keksz (Zabkeksz, Mandulás, Gyömbéres, Kakaós-narancsos)
+        </div>
+        <div style="background: var(--color-surface); padding: 12px 16px; border-radius: 14px; font-size: 14px;">
+          <strong style="color: var(--color-primary);">3. Nyereménykategória:</strong> Naked Noble Mega Box válogatás
+        </div>
+      </div>
+      <button id="close-info-btn" type="button" class="modal-cta-btn" style="height: 48px;">
+        BEZÁRÁS
+      </button>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      // Naked Noble Product Catalog with Prize Tiers
+      const PRODUCTS = [
+        {
+          id: 'kakaos-keksz',
+          name: 'Kakaós keksz',
+          categoryTitle: 'Ropogós keksz – Kakaós-narancsos',
+          categoryBadge: '2. NYEREMÉNYKATEGÓRIA',
+          image: 'images/kakaos-narancsos-keksz.png'
+        },
+        {
+          id: 'banankrem',
+          name: 'Banánkrém',
+          categoryTitle: 'Krémes finomság – Banánkrém',
+          categoryBadge: '1. NYEREMÉNYKATEGÓRIA',
+          image: 'images/banankrem.png'
+        },
+        {
+          id: 'mandulas-keksz',
+          name: 'Mandulás keksz',
+          categoryTitle: 'Ropogós keksz – Mandulás keksz',
+          categoryBadge: '2. NYEREMÉNYKATEGÓRIA',
+          image: 'images/mandulas-keksz.png'
+        },
+        {
+          id: 'eperkrem',
+          name: 'Eperkrém',
+          categoryTitle: 'Krémes finomság – Eperkrém',
+          categoryBadge: '1. NYEREMÉNYKATEGÓRIA',
+          image: 'images/eperkrem.png'
+        },
+        {
+          id: 'zabkeksz',
+          name: 'Ropogós zabkeksz',
+          categoryTitle: 'Ropogós keksz – Zabkeksz',
+          categoryBadge: '2. NYEREMÉNYKATEGÓRIA',
+          image: 'images/zabkeksz.png'
+        },
+        {
+          id: 'kokuszos-mandulakrem',
+          name: 'Kókuszos mandulakrém',
+          categoryTitle: 'Krémes finomság – Kókuszos mandulakrém',
+          categoryBadge: '1. NYEREMÉNYKATEGÓRIA',
+          image: 'images/kokuszos-mandulakrem.png'
+        },
+        {
+          id: 'gyomberes-keksz',
+          name: 'Gyömbéres keksz',
+          categoryTitle: 'Naked Noble Mega Box – Kézműves válogatás',
+          categoryBadge: '3. NYEREMÉNYKATEGÓRIA',
+          image: 'images/gyomberes-keksz.png'
+        }
+      ];
+
+      // DOM Elements
+      const gameBoard = document.getElementById('game-board');
+      const cards = [
+        document.getElementById('card-0'),
+        document.getElementById('card-1'),
+        document.getElementById('card-2')
+      ];
+      const strips = [
+        document.getElementById('strip-0'),
+        document.getElementById('strip-1'),
+        document.getElementById('strip-2')
+      ];
+      const spinBtn = document.getElementById('spin-btn');
+      const spinBtnText = document.getElementById('spin-btn-text');
+
+      const winnerModal = document.getElementById('winner-modal');
+      const modalPrizeImg = document.getElementById('modal-prize-img');
+      const modalPrizeName = document.getElementById('modal-prize-name');
+      const modalPrizeCategory = document.getElementById('modal-prize-category');
+      const nextPlayerBtn = document.getElementById('next-player-btn');
+      const confettiLayer = document.getElementById('confetti-layer');
+
+      const soundBtn = document.getElementById('sound-btn');
+      const soundOnSvg = document.getElementById('sound-on-svg');
+      const soundOffSvg = document.getElementById('sound-off-svg');
+      const fullscreenBtn = document.getElementById('fullscreen-btn');
+      const fsEnterSvg = document.getElementById('fs-enter-svg');
+      const fsExitSvg = document.getElementById('fs-exit-svg');
+      const infoBtn = document.getElementById('info-btn');
+      const infoModal = document.getElementById('info-modal');
+      const closeInfoBtn = document.getElementById('close-info-btn');
+
+      // Pleasant, Non-Casino Organic Web Audio Engine
+      let audioCtx = null;
+      let soundEnabled = true;
+
+      function initAudio() {
+        if (!audioCtx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioContextClass) {
+            audioCtx = new AudioContextClass();
+          }
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+      }
+
+      // Soft warm wooden button click
+      function playSoftClick() {
+        if (!soundEnabled || !audioCtx) return;
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(320, now);
+        osc.frequency.exponentialRampToValueAtTime(140, now + 0.06);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.06);
+      }
+
+      // Gentle marimba-like settle tone when each column stops
+      function playColumnSettle(stepIndex) {
+        if (!soundEnabled || !audioCtx) return;
+        const freqs = [392.0, 440.0, 523.25]; // G4, A4, C5
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freqs[stepIndex % freqs.length], now);
+        gain.gain.setValueAtTime(0.22, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.18);
+      }
+
+      // Warm, elegant chime chord on win (no harsh arcade sirens)
+      function playElegantWinChime() {
+        if (!soundEnabled || !audioCtx) return;
+        const notes = [523.25, 659.25, 783.99, 1046.5]; // C5 major 7th / octave warm arpeggio
+        notes.forEach((freq, idx) => {
+          const start = audioCtx.currentTime + idx * 0.09;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, start);
+          gain.gain.setValueAtTime(0.001, start);
+          gain.gain.linearRampToValueAtTime(0.2, start + 0.03);
+          gain.gain.exponentialRampToValueAtTime(0.0008, start + 0.75);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(start);
+          osc.stop(start + 0.75);
+        });
+      }
+
+      // Top Controls Event Listeners
+      soundBtn.addEventListener('click', () => {
+        initAudio();
+        soundEnabled = !soundEnabled;
+        soundOnSvg.style.display = soundEnabled ? 'block' : 'none';
+        soundOffSvg.style.display = soundEnabled ? 'none' : 'block';
+        soundBtn.blur();
+      });
+
+      fullscreenBtn.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen?.().catch(() => {});
+        } else {
+          document.exitFullscreen?.().catch(() => {});
+        }
+        fullscreenBtn.blur();
+      });
+
+      document.addEventListener('fullscreenchange', () => {
+        const isFs = Boolean(document.fullscreenElement);
+        fsEnterSvg.style.display = isFs ? 'none' : 'block';
+        fsExitSvg.style.display = isFs ? 'block' : 'none';
+      });
+
+      infoBtn.addEventListener('click', () => {
+        infoModal.classList.add('is-open');
+        infoBtn.blur();
+      });
+
+      closeInfoBtn.addEventListener('click', () => {
+        infoModal.classList.remove('is-open');
+        closeInfoBtn.blur();
+      });
+
+      infoModal.addEventListener('click', (e) => {
+        if (e.target === infoModal) {
+          infoModal.classList.remove('is-open');
+        }
+      });
+
+      // Reel Strip Setup & Rendering
+      const STRIP_ITEMS = 18;
+      const TARGET_STOP_INDEX = 15;
+      let isSpinning = false;
+      let currentDisplayedItems = [PRODUCTS[0], PRODUCTS[1], PRODUCTS[2]];
+
+      function getCardHeight() {
+        return cards[0].clientHeight;
+      }
+
+      function createReelItemNode(product, heightPx) {
+        const item = document.createElement('div');
+        item.className = 'reel-item';
+        item.style.height = `${heightPx}px`;
+        item.innerHTML = `
+          <div class="product-image-frame">
+            <img src="${product.image}" alt="${product.name}" loading="eager" />
+          </div>
+          <div class="product-name">${product.name}</div>
+        `;
+        return item;
+      }
+
+      function renderInitialReels() {
+        const h = getCardHeight();
+        strips.forEach((strip, colIdx) => {
+          strip.innerHTML = '';
+          strip.style.transition = 'none';
+          strip.style.transform = 'translateY(0px)';
+          strip.appendChild(createReelItemNode(currentDisplayedItems[colIdx], h));
+        });
+      }
+
+      // Initialize once layout is ready
+      requestAnimationFrame(renderInitialReels);
+
+      window.addEventListener('resize', () => {
+        const h = getCardHeight();
+        document.querySelectorAll('.reel-item').forEach((node) => {
+          node.style.height = `${h}px`;
+        });
+        if (!isSpinning) {
+          strips.forEach((strip) => {
+            // Keep resting at the currently visible item
+            const itemCount = strip.children.length;
+            const targetIdx = itemCount > 1 ? TARGET_STOP_INDEX : 0;
+            strip.style.transition = 'none';
+            strip.style.transform = `translateY(-${targetIdx * h}px)`;
+          });
+        }
+      });
+
+      // Subtle Restrained Confetti (8-10 tasteful elements for Phase 2)
+      function spawnSubtleConfetti() {
+        confettiLayer.innerHTML = '';
+        const palette = ['#E8B951', '#D98F9D', '#F4AD83', '#B7C5AC', '#173D36'];
+        const count = 10;
+
+        for (let i = 0; i < count; i++) {
+          const el = document.createElement('div');
+          el.className = 'confetti-piece';
+          const isCircle = i % 2 === 0;
+          const size = isCircle ? 10 + (i % 3) * 4 : 14 + (i % 3) * 4;
+          const left = 18 + (i * 6.8) + (Math.random() * 4 - 2);
+          const startTop = 25 + (Math.random() * 20);
+          const color = palette[i % palette.length];
+
+          el.style.width = `${size}px`;
+          el.style.height = isCircle ? `${size}px` : `${size * 0.55}px`;
+          el.style.borderRadius = isCircle ? '999px' : '4px';
+          el.style.backgroundColor = color;
+          el.style.left = `${left}%`;
+          el.style.top = `${startTop}%`;
+
+          confettiLayer.appendChild(el);
+
+          const driftX = (Math.random() - 0.5) * 90;
+          const fallY = 120 + Math.random() * 140;
+          const rot = (Math.random() - 0.5) * 220;
+
+          el.animate(
+            [
+              { opacity: 0, transform: 'translate(0, -20px) scale(0.6) rotate(0deg)' },
+              { opacity: 0.9, transform: `translate(${driftX * 0.4}px, ${fallY * 0.35}px) scale(1) rotate(${rot * 0.5}deg)`, offset: 0.35 },
+              { opacity: 0, transform: `translate(${driftX}px, ${fallY}px) scale(0.85) rotate(${rot}deg)` }
+            ],
+            {
+              duration: 1800 + Math.random() * 500,
+              easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+              fill: 'forwards'
+            }
+          );
+        }
+      }
+
+      // Spin Sequence with 3-Phase Celebration
+      function startSpin() {
+        if (isSpinning) return;
+        initAudio();
+        isSpinning = true;
+
+        // Button press feedback
+        playSoftClick();
+        spinBtn.classList.add('pressed');
+        setTimeout(() => spinBtn.classList.remove('pressed'), 160);
+
+        spinBtn.disabled = true;
+        spinBtnText.textContent = 'PÖRGETÉS...';
+        gameBoard.classList.add('is-spinning');
+        cards.forEach((c) => c.classList.remove('winning-card'));
+
+        // Business logic: select the guaranteed winning product before animation starts
+        const winningProduct = PRODUCTS[Math.floor(Math.random() * PRODUCTS.length)];
+        const h = getCardHeight();
+
+        // Populate each column's strip:
+        // Index 0 = currently displayed item, Middle = random items, Index TARGET_STOP_INDEX = winningProduct
+        strips.forEach((strip, colIdx) => {
+          strip.innerHTML = '';
+          strip.style.transition = 'none';
+          strip.style.transform = 'translateY(0px)';
+
+          for (let i = 0; i < STRIP_ITEMS; i++) {
+            let itemProd;
+            if (i === 0) {
+              itemProd = currentDisplayedItems[colIdx];
+            } else if (i === TARGET_STOP_INDEX) {
+              itemProd = winningProduct;
+            } else {
+              itemProd = PRODUCTS[(i * 2 + colIdx * 3 + Math.floor(Math.random() * PRODUCTS.length)) % PRODUCTS.length];
+            }
+            strip.appendChild(createReelItemNode(itemProd, h));
+          }
+        });
+
+        // Update current items state to the new winner
+        currentDisplayedItems = [winningProduct, winningProduct, winningProduct];
+
+        // Force reflow before starting CSS transition
+        void strips[0].offsetHeight;
+
+        // Staggered column spin (220ms difference between columns, ~2.1s - 2.55s total)
+        const baseDurationMs = 1950;
+        const staggerMs = 230;
+
+        strips.forEach((strip, colIdx) => {
+          const colDuration = baseDurationMs + colIdx * staggerMs;
+          strip.classList.add('motion-blur');
+          strip.style.transition = `transform ${colDuration}ms var(--ease-spring)`;
+          strip.style.transform = `translateY(-${TARGET_STOP_INDEX * h}px)`;
+
+          // Remove motion blur slightly before settle & play gentle marimba settle sound
+          setTimeout(() => {
+            strip.classList.remove('motion-blur');
+            playColumnSettle(colIdx);
+          }, colDuration - 160);
+        });
+
+        const totalSpinTime = baseDurationMs + 2 * staggerMs;
+
+        // PHASE 1: Spin stops -> Golden border & light shimmer on the 3 winning cards
+        setTimeout(() => {
+          gameBoard.classList.remove('is-spinning');
+          cards.forEach((c) => c.classList.add('winning-card'));
+          playElegantWinChime();
+
+          // PHASE 2 & 3: After brief golden highlight (550ms), dim background + 8-10 subtle confetti + fade/scale in modal
+          setTimeout(() => {
+            showWinnerModal(winningProduct);
+          }, 550);
+        }, totalSpinTime);
+      }
+
+      function showWinnerModal(product) {
+        modalPrizeImg.src = product.image;
+        modalPrizeImg.alt = product.name;
+        modalPrizeName.textContent = product.categoryTitle;
+        modalPrizeCategory.textContent = product.categoryBadge;
+
+        spawnSubtleConfetti();
+        winnerModal.classList.add('is-open');
+
+        isSpinning = false;
+        spinBtn.disabled = false;
+        spinBtnText.textContent = 'PÖRGETÉS';
+      }
+
+      function resetForNextPlayer() {
+        playSoftClick();
+        winnerModal.classList.remove('is-open');
+        confettiLayer.innerHTML = '';
+        cards.forEach((c) => c.classList.remove('winning-card'));
+      }
+
+      // Button Clicks
+      spinBtn.addEventListener('click', () => {
+        spinBtn.blur();
+        startSpin();
+      });
+
+      nextPlayerBtn.addEventListener('click', () => {
+        nextPlayerBtn.blur();
+        resetForNextPlayer();
+      });
+
+      // Keyboard Support (Space & Enter)
+      window.addEventListener('keydown', (e) => {
+        if (e.code === 'Space' || e.code === 'Enter' || e.key === ' ' || e.key === 'Enter') {
+          if (e.repeat) return;
+          e.preventDefault();
+
+          if (infoModal.classList.contains('is-open')) {
+            infoModal.classList.remove('is-open');
+            return;
+          }
+
+          if (winnerModal.classList.contains('is-open')) {
+            resetForNextPlayer();
+          } else if (!isSpinning) {
+            startSpin();
+          }
+        } else if (e.key === 'Escape') {
+          infoModal.classList.remove('is-open');
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
+

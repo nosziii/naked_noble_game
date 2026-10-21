@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+
+<html lang="hu"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Naked Noble - Pörgess és Nyerj!</title>
+<!-- Google Fonts for artisanal brand look -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&amp;family=Shrikhand&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              cream: '#fbf7f0',
+              creamDark: '#f3ece0',
+              rose: '#c27d88',
+              roseHover: '#ab6c76',
+              roseDeep: '#9c5c66',
+              pine: '#17433c',
+              pineDark: '#0e2b26',
+              pineLight: '#265b52',
+              gold: '#eab308',
+              goldLight: '#fef08a'
+            }
+          },
+          fontFamily: {
+            display: ['"Shrikhand"', 'cursive'],
+            body: ['"Plus Jakarta Sans"', 'sans-serif']
+          },
+          boxShadow: {
+            'retro': '0 15px 35px -5px rgba(23, 67, 60, 0.25), 0 5px 15px rgba(194, 125, 136, 0.2)',
+            'slot': 'inset 0 10px 25px rgba(0,0,0,0.5), inset 0 -10px 25px rgba(0,0,0,0.5)',
+            'knob': '0 8px 15px rgba(0, 0, 0, 0.35), inset 0 2px 4px rgba(255, 255, 255, 0.6)'
+          }
+        }
+      }
+    }
+  </script>
+<!-- BEGIN: Custom Machine & Lever Styles -->
+<style data-purpose="slot-machine-components">
+    /* Reel Window & Mask */
+    .reel-window {
+      height: 220px;
+      overflow: hidden;
+      position: relative;
+    }
+    @media (min-width: 768px) {
+      .reel-window {
+        height: 260px;
+      }
+    }
+
+    .reel-strip {
+      transition: transform 2.8s cubic-bezier(0.12, 0.8, 0.2, 1);
+      will-change: transform;
+    }
+
+    /* Slot Glass Reflection */
+    .glass-overlay {
+      pointer-events: none;
+      background: linear-gradient(180deg, 
+        rgba(255,255,255,0.4) 0%, 
+        rgba(255,255,255,0.05) 30%, 
+        rgba(0,0,0,0) 50%, 
+        rgba(0,0,0,0.3) 100%);
+    }
+
+    /* Mechanical Pull Lever */
+    .lever-wrapper {
+      perspective: 800px;
+    }
+
+    .lever-bar-container {
+      transform-origin: bottom center;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .lever-bar-container.pulled {
+      transform: rotateX(68deg) scaleY(0.72) translateY(32px);
+      transition: transform 0.18s cubic-bezier(0.1, 0.9, 0.2, 1);
+    }
+
+    /* Bulb light glow pulsation */
+    @keyframes bulbGlow {
+      0%, 100% { opacity: 0.9; transform: scale(1); filter: drop-shadow(0 0 6px #fde047); }
+      50% { opacity: 0.45; transform: scale(0.92); filter: drop-shadow(0 0 2px #eab308); }
+    }
+    .retro-bulb {
+      animation: bulbGlow 1.6s infinite ease-in-out;
+    }
+    .retro-bulb:nth-child(even) {
+      animation-delay: 0.8s;
+    }
+
+    /* Gold Trim Texture */
+    .gold-emboss {
+      background: linear-gradient(135deg, #fce09b 0%, #dfa84b 50%, #b88127 100%);
+      box-shadow: inset 0 1px 2px rgba(255,255,255,0.6), 0 3px 6px rgba(0,0,0,0.25);
+    }
+  </style>
+<!-- END: Custom Machine & Lever Styles -->
+</head>
+<body class="bg-brand-cream text-brand-pine min-h-screen font-body flex flex-col items-center justify-between overflow-x-hidden selection:bg-brand-rose selection:text-white">
+<!-- Confetti Canvas overlay for celebrations -->
+<canvas class="fixed inset-0 pointer-events-none z-50 w-full h-full" data-purpose="celebration-particles" id="confetti-canvas"></canvas>
+<!-- BEGIN: HeroHeader -->
+<header class="w-full max-w-6xl mx-auto pt-6 pb-2 px-4 text-center" data-purpose="header">
+<div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-rose/15 text-brand-roseDeep text-xs md:text-sm font-bold tracking-wider uppercase mb-3">
+<span class="inline-block w-2.5 h-2.5 rounded-full bg-brand-rose animate-ping"></span>
+      100% Garantált Ajándék · Nincs vesztes pörgetés!
+    </div>
+<h1 class="font-display text-4xl sm:text-5xl md:text-6xl text-brand-rose tracking-wide drop-shadow-sm">
+      NAKED NOBLE
+    </h1>
+<h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-brand-pine mt-1 tracking-tight">
+      PÖRGESS ÉS NYERJ!
+    </h2>
+<p class="max-w-2xl mx-auto text-sm sm:text-base text-brand-pine/80 font-medium mt-2 leading-relaxed">
+      Húzd meg a mechanikus kart a jobb oldalon, pörgess a 3 tárcsán és zsebeld be a finom vegán finomságok egyikét! Minden pörgetés garantáltan nyer!
+    </p>
+</header>
+<!-- END: HeroHeader -->
+<!-- BEGIN: ArcadeSlotSection -->
+<main class="w-full max-w-5xl mx-auto px-4 py-4 flex flex-col items-center justify-center" data-purpose="game-stage">
+<!-- Outer Arcade Machine Housing -->
+<div class="relative w-full max-w-4xl flex items-center justify-center">
+<!-- Main Wooden/Rose Machine Body -->
+<section aria-label="Naked Noble Nyerőgép" class="relative z-10 w-full max-w-2xl bg-gradient-to-b from-[#ca838e] via-brand-rose to-brand-roseDeep p-4 sm:p-7 rounded-[2.5rem] shadow-retro border-4 sm:border-[6px] border-[#dfa84b]">
+<!-- Marquee Light Bulbs (Top Bar) -->
+<div class="flex items-center justify-between px-3 pb-3 pt-1 border-b border-white/20 mb-4" data-purpose="bulb-lights">
+<span class="w-3.5 h-3.5 rounded-full bg-yellow-300 retro-bulb"></span>
+<span class="w-3.5 h-3.5 rounded-full bg-yellow-300 retro-bulb"></span>
+<span class="w-3.5 h-3.5 rounded-full bg-yellow-300 retro-bulb"></span>
+<div class="px-5 py-1 bg-brand-pine text-brand-goldLight rounded-full text-xs md:text-sm font-black tracking-widest uppercase shadow-inner">
+            VEGÁN &amp; MENTES NYEREMÉNYEK
+          </div>
+<span class="w-3.5 h-3.5 rounded-full bg-yellow-300 retro-bulb"></span>
+<span class="w-3.5 h-3.5 rounded-full bg-yellow-300 retro-bulb"></span>
+<span class="w-3.5 h-3.5 rounded-full bg-yellow-300 retro-bulb"></span>
+</div>
+<!-- Inner Reel Bezel (Dark Metallic & Gold frame) -->
+<div class="bg-gradient-to-b from-[#122e29] to-brand-pine p-3 sm:p-5 rounded-2xl shadow-inner border-2 border-brand-pineDark">
+<!-- Central Winning Indicator Line -->
+<div class="relative grid grid-cols-3 gap-2.5 sm:gap-4 bg-black/60 p-2 sm:p-3 rounded-xl shadow-slot">
+<!-- Payline laser guides -->
+<div class="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-0.5 bg-yellow-400/30 pointer-events-none z-20 flex justify-between items-center px-1">
+<span class="text-[9px] text-yellow-300 bg-brand-pine/90 px-1 py-0.5 rounded font-mono">WIN</span>
+<span class="text-[9px] text-yellow-300 bg-brand-pine/90 px-1 py-0.5 rounded font-mono">LINE</span>
+</div>
+<!-- REEL 1 -->
+<div class="reel-window bg-brand-cream rounded-lg overflow-hidden relative shadow-md border border-neutral-300" data-purpose="slot-reel" id="reel-1">
+<div class="glass-overlay absolute inset-0 z-10"></div>
+<div class="reel-strip flex flex-col" id="strip-1">
+<!-- Dynamically generated items -->
+</div>
+</div>
+<!-- REEL 2 -->
+<div class="reel-window bg-brand-cream rounded-lg overflow-hidden relative shadow-md border border-neutral-300" data-purpose="slot-reel" id="reel-2">
+<div class="glass-overlay absolute inset-0 z-10"></div>
+<div class="reel-strip flex flex-col" id="strip-2">
+<!-- Dynamically generated items -->
+</div>
+</div>
+<!-- REEL 3 -->
+<div class="reel-window bg-brand-cream rounded-lg overflow-hidden relative shadow-md border border-neutral-300" data-purpose="slot-reel" id="reel-3">
+<div class="glass-overlay absolute inset-0 z-10"></div>
+<div class="reel-strip flex flex-col" id="strip-3">
+<!-- Dynamically generated items -->
+</div>
+</div>
+</div>
+<!-- Status LCD Display -->
+<div class="mt-4 bg-[#0a1b18] border-2 border-yellow-600/40 rounded-xl px-4 py-2.5 flex items-center justify-between text-yellow-400 font-mono shadow-inner">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+<span class="text-xs tracking-wider uppercase text-yellow-200">GÉP STÁTUSZ:</span>
+</div>
+<div class="text-xs sm:text-sm font-bold text-yellow-300 tracking-wider truncate ml-2" id="machine-status-text">
+              KÉSZEN ÁLL! HÚZD MEG A KART! →
+            </div>
+</div>
+</div>
+<!-- Machine Lower Control Tray -->
+<div class="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 px-2">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full gold-emboss flex items-center justify-center font-display text-brand-pine font-black text-lg shadow-sm">
+              ★
+            </div>
+<div class="text-left text-white leading-tight">
+<div class="text-xs font-semibold uppercase tracking-wider text-amber-200">Különleges kiadás</div>
+<div class="text-sm font-bold">100% Növényi élvezet</div>
+</div>
+</div>
+<!-- Big Golden Action Button (alternative trigger to physical lever) -->
+<button class="w-full sm:w-auto px-8 py-3.5 rounded-xl font-black text-brand-pine text-base uppercase tracking-wider gold-emboss hover:brightness-110 active:translate-y-0.5 active:shadow-inner transition-all duration-150 flex items-center justify-center gap-2 shadow-lg cursor-pointer" data-purpose="spin-action" id="spin-btn">
+<svg class="w-5 h-5 fill-current animate-spin" style="animation-duration: 4s;" viewbox="0 0 24 24">
+<path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46A7.93 7.93 0 0020 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74A7.93 7.93 0 004 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"></path>
+</svg>
+<span>PÖRGESS ÉS NYERJ!</span>
+</button>
+</div>
+</section>
+<!-- BEGIN: MechanicalPullLever -->
+<!-- Interactive Physical Lever on the Right Side -->
+<aside class="relative z-20 -ml-2 sm:-ml-3 lever-wrapper flex flex-col items-center justify-center cursor-pointer select-none group" data-purpose="mechanical-lever" id="lever-interactive" title="Kattints ide a kar meghúzásához!">
+<!-- Hover hint balloon -->
+<div class="hidden sm:block absolute -top-12 right-0 bg-brand-pine text-yellow-300 text-[11px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md shadow-md whitespace-nowrap animate-bounce pointer-events-none">
+          Húzd meg itt! ↓
+        </div>
+<div class="relative flex flex-col items-center">
+<!-- Lever Pivot Axle / Base on the machine -->
+<div class="w-12 h-14 bg-gradient-to-r from-neutral-600 via-neutral-400 to-neutral-700 rounded-r-xl border-l-2 border-neutral-800 shadow-xl flex items-center justify-center">
+<div class="w-5 h-5 rounded-full bg-neutral-900 border border-neutral-500 shadow-inner"></div>
+</div>
+<!-- Lever Rod & Knob container that pivots -->
+<div class="lever-bar-container absolute bottom-7 flex flex-col items-center" id="lever-arm">
+<!-- Red / Crimson Glossy Knob -->
+<div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-red-500 via-red-600 to-rose-950 shadow-knob border-2 border-red-300 flex items-center justify-center transition-transform group-hover:scale-105 active:scale-95 cursor-grab" id="lever-knob">
+<div class="w-4 h-4 rounded-full bg-white/40 blur-[1px] -mt-5 -ml-4"></div>
+</div>
+<!-- Polished Chrome Shaft -->
+<div class="w-4 sm:w-5 h-36 sm:h-44 bg-gradient-to-r from-slate-300 via-white to-slate-400 border border-slate-400 shadow-md -mt-1"></div>
+</div>
+</div>
+</aside>
+<!-- END: MechanicalPullLever -->
+</div>
+</main>
+<!-- END: ArcadeSlotSection -->
+<!-- BEGIN: PrizeCategoriesGuide -->
+<!-- 3 Guaranteed Prize Preview Cards -->
+<section class="w-full max-w-5xl mx-auto px-4 py-4" data-purpose="prize-tiers-guide">
+<div class="text-center mb-3">
+<h3 class="font-extrabold text-lg sm:text-xl text-brand-pine tracking-tight">
+        A 3 Garantált Nyereménykategória
+      </h3>
+<p class="text-xs sm:text-sm text-brand-pine/70 font-medium">Bármit is pörgetsz, a 3 egyforma kép után azonnal a tiéd az adott ajándékcsomag!</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+<!-- Prize 1: Magkrémek -->
+<article class="bg-white rounded-2xl p-3.5 border-2 border-brand-rose/20 shadow-sm flex items-center gap-3.5 transition-all hover:border-brand-rose hover:shadow-md">
+<img alt="Naked Noble Kókuszos Mandulakrém" class="w-16 h-16 object-contain rounded-xl bg-brand-cream p-1 border border-neutral-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCqFjb4ZL7fdPSf-9RZ8-CYdgPICvV7aqV5HGawRl-ZowaxoHQnm3Qh8mxJItp57Es8fPtD1GcmwrMdI4aC6AMMjCYAyfpRYTmXx9BOmvpV2Cqa3QDglH5OgZTsonesJc9Dn_KnyuICu8pkYo0_VNmbPHqd4KGYhRGM27V4_ZRjS87Vk8nEavTqHxdOGZbK6vWgtnhQs8U_3w5jsiOiQQqJYOschT6pgLD5Q_PYQR5hk6VwNJ8HeJk9eCy7yfEHpk_S2Q"/>
+<div>
+<span class="text-[10px] font-extrabold bg-brand-rose/15 text-brand-roseDeep px-2 py-0.5 rounded-full uppercase">1. Nyeremény</span>
+<h4 class="font-bold text-sm sm:text-base text-brand-pine">Krémes Finomság</h4>
+<p class="text-xs text-brand-pine/70">Ínycsiklandó gyümölcs- vagy magkrém hozzáadott cukor nélkül.</p>
+</div>
+</article>
+<!-- Prize 2: Kekszek -->
+<article class="bg-white rounded-2xl p-3.5 border-2 border-brand-rose/20 shadow-sm flex items-center gap-3.5 transition-all hover:border-brand-rose hover:shadow-md">
+<img alt="Naked Noble Zabkeksz" class="w-16 h-16 object-contain rounded-xl bg-brand-cream p-1 border border-neutral-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuASCAFxraFpb31licQgdT9TMTYd_uN2kGKdfXcn15u1JPQ0DnY4YptKJB32XdQ6Dd2R5MptMkDGzqxtmiY1e61dvO-nKW2rj2_IXj2UykeGFi_s4lN0IB_Knf3VZGi7iz87FcMk0xLKbdSqsO29GwEilvor-pHR5fpwUZNbaH--aTZjwHDA4sx-5g-cSDZQECi2xsJKj4lwokjDtCV0UW8uL0eIAjKN9VhVdvCyhDAQ33_O4YjbgLd4wXOdrvRo-XQFPA"/>
+<div>
+<span class="text-[10px] font-extrabold bg-emerald-100 text-brand-pine px-2 py-0.5 rounded-full uppercase">2. Nyeremény</span>
+<h4 class="font-bold text-sm sm:text-base text-brand-pine">Ropogós Zabkeksz</h4>
+<p class="text-xs text-brand-pine/70">Gluténmentes, szójamentes vegán zabkeksz csomag.</p>
+</div>
+</article>
+<!-- Prize 3: Mega Box -->
+<article class="bg-white rounded-2xl p-3.5 border-2 border-brand-rose/20 shadow-sm flex items-center gap-3.5 transition-all hover:border-brand-rose hover:shadow-md">
+<img alt="Naked Noble Ajándékválogatás" class="w-16 h-16 object-contain rounded-xl bg-brand-cream p-1 border border-neutral-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrqeYqf2Ahc0T2Upl15QJ8PEvWAjRwWyvRoBf_1fK7-6snWO13wCS_v7UALtF5OuZ-NOltfiXVsKrbV87-TwAo-B0E7EX-EATwj1R6--sX9ygTDjXqlVN__ENbaQX8Cq3bJBjjnquTvuQXFzKXvb6LgT-5-rFCIfmpnXy40CxAwkah6muLqNg2vH92CNyMMwO8kmLcGbO8oiJXsw9Myo698RwglyRgaKKO906w9vQiDlcUl5HIA1bU9y0gmDElOZ-vag"/>
+<div>
+<span class="text-[10px] font-extrabold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full uppercase">3. Nyeremény</span>
+<h4 class="font-bold text-sm sm:text-base text-brand-pine">Naked Noble Mega Box</h4>
+<p class="text-xs text-brand-pine/70">Kombinált nagy kóstolócsomag krémekkel és ropogós kekszekkel.</p>
+</div>
+</article>
+</div>
+</section>
+<!-- END: PrizeCategoriesGuide -->
+<!-- BEGIN: BottomDisclaimer -->
+<footer class="w-full text-center py-3 text-brand-pine/60 text-xs" data-purpose="footer-info">
+    © Naked Noble. Minden jog fenntartva. Mentes finomságok kompromisszumok nélkül.
+  </footer>
+<!-- END: BottomDisclaimer -->
+<!-- BEGIN: WinnerModal -->
+<div class="fixed inset-0 bg-brand-pineDark/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300" data-purpose="win-celebration-popup" id="winner-modal">
+<div class="bg-brand-cream border-4 border-[#dfa84b] rounded-3xl max-w-lg w-full p-6 sm:p-8 text-center shadow-2xl transform scale-95 transition-transform duration-300" id="winner-card">
+<!-- Top festive tag -->
+<div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-emerald-100 text-emerald-900 font-extrabold text-xs uppercase tracking-wider mb-2">
+<span class="text-base">🎉</span> Fantasztikus pörgetés!
+      </div>
+<h3 class="font-display text-3xl sm:text-4xl text-brand-rose tracking-wide mt-1">
+        GRATULÁLUNK!
+      </h3>
+<p class="text-xl font-black text-brand-pine mt-0.5" id="modal-prize-title">
+        Nyereményed megérkezett!
+      </p>
+<!-- Prize Image Display -->
+<div class="my-4 flex items-center justify-center">
+<div class="relative w-36 h-36 bg-white rounded-2xl border-2 border-brand-rose/30 p-2 shadow-inner flex items-center justify-center overflow-hidden">
+<img alt="Nyeremény" class="max-h-full max-w-full object-contain transform hover:scale-105 transition-transform" id="modal-prize-img" src=""/>
+</div>
+</div>
+<p class="text-sm text-brand-pine/80 font-medium px-4" id="modal-prize-desc">
+        A te garantált ajándékod a Naked Noble legfinomabb vegán finomsága!
+      </p>
+<!-- Coupon / Redemption Box -->
+<div class="mt-4 p-3 bg-white rounded-xl border border-dashed-2 border-brand-rose/60 flex items-center justify-between gap-2 max-w-xs mx-auto">
+<div class="text-left">
+<span class="block text-[10px] uppercase font-bold text-brand-pine/60">Ajándékkódod:</span>
+<span class="font-mono font-black text-base text-brand-roseDeep tracking-wider" id="modal-coupon-code">NOBLE-VEGAN-100</span>
+</div>
+<button class="text-xs bg-brand-pine text-white px-3 py-1.5 rounded-lg font-bold hover:bg-brand-pineLight active:scale-95 transition-transform" id="copy-btn">
+          Másolás
+        </button>
+</div>
+<!-- Action Buttons -->
+<div class="mt-6 flex flex-col sm:flex-row gap-2.5 justify-center">
+<button class="px-6 py-3 rounded-xl gold-emboss text-brand-pine font-black text-sm uppercase tracking-wider hover:brightness-105 transition-all shadow-md" id="claim-prize-btn">
+          KÉREM A NYEREMÉNYT!
+        </button>
+<button class="px-6 py-3 rounded-xl bg-transparent border-2 border-brand-pine text-brand-pine font-black text-sm uppercase tracking-wider hover:bg-brand-pine hover:text-white transition-all" id="play-again-btn">
+          Újra játszom
+        </button>
+</div>
+</div>
+</div>
+<!-- END: WinnerModal -->
+<!-- BEGIN: GameLogicScript -->
+<script data-purpose="slot-game-engine">
+    // Definition of the 3 guaranteed prize categories and product assets
+    const PRIZES = [
+      {
+        id: 'cream',
+        title: 'Krémes Finomságok Válogatás',
+        subtitle: '1 üveg prémium vegán mogyoró- vagy gyümölcskrém!',
+        coupon: 'NOBLE-KREM-100',
+        images: [
+          'https://lh3.googleusercontent.com/aida-public/AB6AXuCqFjb4ZL7fdPSf-9RZ8-CYdgPICvV7aqV5HGawRl-ZowaxoHQnm3Qh8mxJItp57Es8fPtD1GcmwrMdI4aC6AMMjCYAyfpRYTmXx9BOmvpV2Cqa3QDglH5OgZTsonesJc9Dn_KnyuICu8pkYo0_VNmbPHqd4KGYhRGM27V4_ZRjS87Vk8nEavTqHxdOGZbK6vWgtnhQs8U_3w5jsiOiQQqJYOschT6pgLD5Q_PYQR5hk6VwNJ8HeJk9eCy7yfEHpk_S2Q',
+          'https://lh3.googleusercontent.com/aida-public/AB6AXuAw7kEuWFjPLT2lnXNxQ6lkD8BeP_LbZkxf2n6jC2K9k3hM3_X5lDRc2ED9fTVdl_QywT-oPhumcSmOUlWNO9OnDkvHCLOSj-1u34s2vONxrRI1OEgOtkKB0ZMoO3SkCkEfIdyx3T4sa4DQwWfr4e5XtBiOdDBgkfJDKgfwjFurEEYlCpqE0iKXc4dz2D3Mn5C4mbcl8qAWBGs2d0ONZBWCkcOn1SY695-Ukiao0dBWe3yJu0sSRtu7xVESKiKbZaev5w',
+          'https://lh3.googleusercontent.com/aida-public/AB6AXuCEPo68D378u8WFiqPoNsUhaQ49iXafd-2W7ojMFAA_LjqeMu5hJ_2cB80RCsb1vgYrHgnN_OzJ9-a8egVI5kV7ynBpE7uQNSIlisTwYFhHYKApbphK7HGPZaA_h1H6aPcFywSLMaj9WEVjSeDbBdSV4AS5uvlZYUu6VrHzm5224htJ1gbPhwPtgT8uZGjPERBWVNaZOoqmO_UaxfPylZlhQ6zUxbAWzkuN1YhRcNTgKBMd4Xj5oPRWZYuWjlzn_LElKg'
+        ]
+      },
+      {
+        id: 'cookie',
+        title: 'Ropogós Zabkeksz Csomag',
+        subtitle: '1 csomag kézműves gluténmentes vegán zabkeksz!',
+        coupon: 'NOBLE-KEKSZ-100',
+        images: [
+          'https://lh3.googleusercontent.com/aida-public/AB6AXuASCAFxraFpb31licQgdT9TMTYd_uN2kGKdfXcn15u1JPQ0DnY4YptKJB32XdQ6Dd2R5MptMkDGzqxtmiY1e61dvO-nKW2rj2_IXj2UykeGFi_s4lN0IB_Knf3VZGi7iz87FcMk0xLKbdSqsO29GwEilvor-pHR5fpwUZNbaH--aTZjwHDA4sx-5g-cSDZQECi2xsJKj4lwokjDtCV0UW8uL0eIAjKN9VhVdvCyhDAQ33_O4YjbgLd4wXOdrvRo-XQFPA',
+          'https://lh3.googleusercontent.com/aida-public/AB6AXuCJwIpyzLICFpJY_7k0_IInWCebZOxihXyD6mWVWHVwagQHJeZ5DbQ1q06RQCb93EG4kqjHeHdWuofJbxNteXNpueGnH48aXIsOifAr0-gW142BP7orRZnXeaWDJyTMlfdN1cIK4FcDx3eZ5ntRLiy_QcxNAT3U5JOyviKxq1WeIfvCzs4HqdtmFaAR9sZIE8BtGeWDZ4W8q8V9PoCU___IhufINKYsM-4fVO88-EzUawu37JeqMUGqf1txPOkaZou6iw'
+        ]
+      },
+      {
+        id: 'megabox',
+        title: 'Nagy Naked Noble Ajándékbox',
+        subtitle: 'Komplett kóstolócsomag magkrémekkel és kekszekkel!',
+        coupon: 'NOBLE-MEGABOX',
+        images: [
+          'https://lh3.googleusercontent.com/aida-public/AB6AXuDrqeYqf2Ahc0T2Upl15QJ8PEvWAjRwWyvRoBf_1fK7-6snWO13wCS_v7UALtF5OuZ-NOltfiXVsKrbV87-TwAo-B0E7EX-EATwj1R6--sX9ygTDjXqlVN__ENbaQX8Cq3bJBjjnquTvuQXFzKXvb6LgT-5-rFCIfmpnXy40CxAwkah6muLqNg2vH92CNyMMwO8kmLcGbO8oiJXsw9Myo698RwglyRgaKKO906w9vQiDlcUl5HIA1bU9y0gmDElOZ-vag',
+          'https://lh3.googleusercontent.com/aida-public/AB6AXuBA2rVI5ujk36wPErCk6x_tZ3UjC4SkF1vQz9_jJaF4Y0qqTAOAgJ1r2aaWaHTMTYsEpLmbaP36DM8rd_OrDhk47oblC_sJhnErVs2FXTzg-nLVUzwAW2rV9KP4G1uaV06Crz4DPpSKHdnQynw4whCzM6mdS--buD8NVy_PBurVHQUpIn6YL-fZxO8LWO8l9h-y3gboafWoZCQgwccFXSr0fNa-Uml6Ch3a3vzPRqIfEFcsFjxAk5kLWRA_Ep1eHw0YGw'
+        ]
+      }
+    ];
+
+    // Build the visual list of items on each reel
+    // A single reel item height
+    const ITEM_HEIGHT = window.innerWidth >= 768 ? 260 : 220;
+    const STRIP_REPEAT_COUNT = 18; // total sequence length for spin travel
+
+    let isSpinning = false;
+
+    // Elements
+    const strips = [
+      document.getElementById('strip-1'),
+      document.getElementById('strip-2'),
+      document.getElementById('strip-3')
+    ];
+    const leverInteractive = document.getElementById('lever-interactive');
+    const leverArm = document.getElementById('lever-arm');
+    const spinButton = document.getElementById('spin-btn');
+    const statusText = document.getElementById('machine-status-text');
+    const winnerModal = document.getElementById('winner-modal');
+    const winnerCard = document.getElementById('winner-card');
+    const modalPrizeTitle = document.getElementById('modal-prize-title');
+    const modalPrizeDesc = document.getElementById('modal-prize-desc');
+    const modalPrizeImg = document.getElementById('modal-prize-img');
+    const modalCouponCode = document.getElementById('modal-coupon-code');
+    const copyBtn = document.getElementById('copy-btn');
+    const playAgainBtn = document.getElementById('play-again-btn');
+    const claimPrizeBtn = document.getElementById('claim-prize-btn');
+
+    // Helper: Build the strip DOM nodes
+    function populateReels() {
+      strips.forEach((strip, reelIdx) => {
+        strip.innerHTML = '';
+        // Create repeating pattern of prizes
+        for (let i = 0; i < STRIP_REPEAT_COUNT; i++) {
+          const prizeCategory = PRIZES[i % PRIZES.length];
+          // Pick image representative
+          const imgUrl = prizeCategory.images[reelIdx % prizeCategory.images.length];
+
+          const itemNode = document.createElement('div');
+          itemNode.className = 'w-full flex-shrink-0 flex flex-col items-center justify-center p-3 select-none';
+          itemNode.style.height = `${ITEM_HEIGHT}px`;
+
+          itemNode.innerHTML = `
+            <div class="w-full h-full bg-white rounded-xl shadow-sm border border-neutral-100 flex flex-col items-center justify-center p-2">
+              <img src="${imgUrl}" alt="${prizeCategory.title}" class="max-h-[140px] md:max-h-[170px] w-auto object-contain pointer-events-none drop-shadow-sm transition-transform">
+              <span class="mt-1 text-[11px] md:text-xs font-bold text-brand-pine line-clamp-1">${prizeCategory.title}</span>
+            </div>
+          `;
+          strip.appendChild(itemNode);
+        }
+      });
+    }
+
+    populateReels();
+
+    // Trigger Pull & Spin Logic
+    function pullAndSpin() {
+      if (isSpinning) return;
+      isSpinning = true;
+
+      // Update state & status
+      statusText.textContent = 'PÖRGÉS FOLYAMATBAN... SZURKOLJ!';
+      spinButton.disabled = true;
+      spinButton.classList.add('opacity-75', 'cursor-not-allowed');
+
+      // Animate physical lever
+      leverArm.classList.add('pulled');
+      setTimeout(() => {
+        leverArm.classList.remove('pulled');
+      }, 350);
+
+      // Randomly pick which of the 3 prizes EVERY reel will match on!
+      // (1: Krémes, 2: Keksz, 3: Megabox)
+      const winningPrizeIndex = Math.floor(Math.random() * PRIZES.length);
+      const chosenPrize = PRIZES[winningPrizeIndex];
+
+      // Target position calculation:
+      // We aim for an index near the bottom end of the strip to allow ample spinning duration
+      const targetCycleIndex = STRIP_REPEAT_COUNT - 4; // near bottom
+      const targetItemIndex = (Math.floor(targetCycleIndex / PRIZES.length) * PRIZES.length) + winningPrizeIndex;
+      const targetOffset = targetItemIndex * ITEM_HEIGHT;
+
+      // Animate strips with staggered stop for dramatic effect
+      strips.forEach((strip, idx) => {
+        const delay = idx * 260; // reel 1 stops, then 2, then 3
+        const duration = 2.4 + (idx * 0.4);
+
+        strip.style.transition = `transform ${duration}s cubic-bezier(0.1, 0.82, 0.25, 1)`;
+        setTimeout(() => {
+          strip.style.transform = `translateY(-${targetOffset}px)`;
+        }, delay);
+      });
+
+      // Total spin duration until reel 3 lands
+      const totalWaitTime = 2400 + (2 * 260) + 400;
+
+      setTimeout(() => {
+        handleWin(chosenPrize);
+      }, totalWaitTime);
+    }
+
+    // Celebration & Modal trigger
+    function handleWin(prize) {
+      statusText.innerHTML = `NYERTÉL: <span class="text-amber-300 font-black">${prize.title.toUpperCase()}</span>!`;
+      
+      // Fire confetti burst
+      startConfetti();
+
+      // Populate Modal
+      modalPrizeTitle.textContent = prize.title;
+      modalPrizeDesc.textContent = prize.subtitle;
+      modalPrizeImg.src = prize.images[0];
+      modalCouponCode.textContent = prize.coupon;
+
+      // Show Modal
+      winnerModal.classList.remove('opacity-0', 'pointer-events-none');
+      winnerCard.classList.remove('scale-95');
+      winnerCard.classList.add('scale-100');
+
+      isSpinning = false;
+      spinButton.disabled = false;
+      spinButton.classList.remove('opacity-75', 'cursor-not-allowed');
+    }
+
+    // Reset machine for another guaranteed spin
+    function resetGame() {
+      winnerModal.classList.add('opacity-0', 'pointer-events-none');
+      winnerCard.classList.add('scale-95');
+      winnerCard.classList.remove('scale-100');
+      statusText.textContent = 'KÉSZEN ÁLL! HÚZD MEG A KART! →';
+
+      // Instantly reset strips to top without animation
+      strips.forEach(strip => {
+        strip.style.transition = 'none';
+        strip.style.transform = 'translateY(0px)';
+      });
+      stopConfetti();
+    }
+
+    // Event Listeners
+    leverInteractive.addEventListener('click', pullAndSpin);
+    spinButton.addEventListener('click', pullAndSpin);
+    playAgainBtn.addEventListener('click', resetGame);
+    
+    claimPrizeBtn.addEventListener('click', () => {
+      alert(`Gratulálunk! Az ajándékod beváltásához használd a ${modalCouponCode.textContent} kódot a vásárlás során!`);
+      resetGame();
+    });
+
+    copyBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(modalCouponCode.textContent).then(() => {
+        copyBtn.textContent = 'Másolva! ✓';
+        setTimeout(() => copyBtn.textContent = 'Másolás', 2000);
+      }).catch(() => {
+        copyBtn.textContent = 'OK!';
+      });
+    });
+
+    // Resize handler to recalculate reel heights on window change
+    window.addEventListener('resize', () => {
+      const newHeight = window.innerWidth >= 768 ? 260 : 220;
+      document.querySelectorAll('.reel-strip > div').forEach(node => {
+        node.style.height = `${newHeight}px`;
+      });
+    });
+  </script>
+<!-- END: GameLogicScript -->
+<!-- BEGIN: ConfettiScript -->
+<script data-purpose="celebration-particles">
+    // Simple vanilla lightweight confetti particle animation
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    let animationFrameId;
+    let particles = [];
+    const colors = ['#c27d88', '#dfa84b', '#17433c', '#fef08a', '#ef4444', '#10b981'];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function createParticles() {
+      particles = [];
+      const count = 120;
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: canvas.width / 2 + (Math.random() - 0.5) * 200,
+          y: canvas.height / 2 + (Math.random() - 0.5) * 100,
+          size: Math.random() * 8 + 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          vx: (Math.random() - 0.5) * 14,
+          vy: Math.random() * -12 - 6,
+          gravity: 0.38,
+          rotation: Math.random() * 360,
+          rotationSpeed: (Math.random() - 0.5) * 10,
+          opacity: 1
+        });
+      }
+    }
+
+    function renderConfetti() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let active = false;
+
+      particles.forEach(p => {
+        p.vy += p.gravity;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rotation += p.rotationSpeed;
+        p.opacity -= 0.005;
+
+        if (p.opacity > 0) {
+          active = true;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rotation * Math.PI) / 180);
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = Math.max(p.opacity, 0);
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.7);
+          ctx.restore();
+        }
+      });
+
+      if (active) {
+        animationFrameId = requestAnimationFrame(renderConfetti);
+      } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+
+    function startConfetti() {
+      cancelAnimationFrame(animationFrameId);
+      resizeCanvas();
+      createParticles();
+      renderConfetti();
+    }
+
+    function stopConfetti() {
+      cancelAnimationFrame(animationFrameId);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  </script>
+<!-- END: ConfettiScript -->
+</body></html>

@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+
+<html lang="hu"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Naked Noble - Pörgess és Nyerj!</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&amp;family=Shrikhand&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              cream: '#fdf9f2',
+              creamDark: '#f1ede6',
+              pine: '#17433c',
+              pineDark: '#0d2824',
+              pineLight: '#245a51',
+              rose: '#c27d88',
+              roseDeep: '#9c5c66',
+              roseLight: '#e4a7b0',
+              gold: '#e5a93c',
+              goldGlow: '#f3c969',
+              goldDark: '#b57917'
+            }
+          },
+          fontFamily: {
+            display: ['"Shrikhand"', 'cursive'],
+            body: ['"Plus Jakarta Sans"', 'sans-serif']
+          },
+          boxShadow: {
+            'arcade-cabinet': '0 25px 60px -15px rgba(13,40,36,0.65), 0 0 45px rgba(229,169,60,0.3)',
+            'gold-glow': '0 0 25px rgba(243, 201, 105, 0.65), inset 0 2px 4px rgba(255,255,255,0.8)',
+            'reel-inner': 'inset 0 16px 30px rgba(0,0,0,0.7), inset 0 -16px 30px rgba(0,0,0,0.7)'
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    /* Vintage Marquee Bulb Animations */
+    @keyframes marqueeFlash {
+      0%, 100% {
+        box-shadow: 0 0 14px 4px #fde047, 0 0 4px #fff;
+        background-color: #fef08a;
+      }
+      50% {
+        box-shadow: 0 0 4px 1px #ca8a04;
+        background-color: #eab308;
+        opacity: 0.55;
+      }
+    }
+    .marquee-bulb {
+      animation: marqueeFlash 1.4s infinite ease-in-out;
+    }
+    .marquee-bulb:nth-child(even) {
+      animation-delay: 0.7s;
+    }
+    .marquee-bulb-pink {
+      animation: marqueeFlashPink 1.4s infinite ease-in-out;
+    }
+    @keyframes marqueeFlashPink {
+      0%, 100% {
+        box-shadow: 0 0 14px 4px #f472b6, 0 0 4px #fff;
+        background-color: #fbcfe8;
+      }
+      50% {
+        box-shadow: 0 0 4px 1px #db2777;
+        background-color: #be185d;
+        opacity: 0.5;
+      }
+    }
+
+    /* 3D Gold Emboss Gradient */
+    .arcade-gold-trim {
+      background: linear-gradient(135deg, #fff3c4 0%, #f3c969 25%, #e5a93c 50%, #b88127 75%, #fae298 100%);
+      box-shadow: inset 0 2px 4px rgba(255,255,255,0.7), inset 0 -2px 4px rgba(0,0,0,0.35), 0 4px 12px rgba(0,0,0,0.4);
+    }
+    .arcade-gold-border {
+      border-image: linear-gradient(to bottom right, #fef08a, #e5a93c, #b88127, #fef08a) 1;
+    }
+
+    /* Glass reflection */
+    .glass-reflection {
+      background: linear-gradient(180deg, 
+        rgba(255,255,255,0.35) 0%, 
+        rgba(255,255,255,0.08) 25%, 
+        transparent 50%, 
+        rgba(0,0,0,0.25) 100%);
+    }
+
+    /* 3D Mechanical Lever Dynamics */
+    .lever-perspective {
+      perspective: 1000px;
+    }
+    .lever-rod {
+      transform-origin: bottom center;
+      transition: transform 0.16s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+    }
+    .lever-rod.pulled {
+      transform: rotateX(68deg) scaleY(0.68) translateY(55px);
+    }
+
+    /* Win-line Neon Indicator */
+    @keyframes winlinePulse {
+      0%, 100% { opacity: 0.95; box-shadow: 0 0 18px #f3c969, inset 0 0 8px #f3c969; }
+      50% { opacity: 0.55; box-shadow: 0 0 8px #b57917, inset 0 0 3px #b57917; }
+    }
+    .win-line-beam {
+      animation: winlinePulse 1.8s infinite ease-in-out;
+    }
+  </style>
+<meta content="web_dashboard" name="shell-type"/>
+</head>
+<body class="bg-[#102420] text-brand-cream min-h-screen font-body flex flex-col items-center justify-between overflow-x-hidden selection:bg-brand-rose selection:text-white relative">
+<!-- Confetti Canvas overlay for celebrations -->
+<canvas class="fixed inset-0 pointer-events-none z-50 w-full h-full" id="kiosk-confetti-canvas"></canvas>
+<!-- Sound Toggle Floating Pill -->
+<aside aria-label="Audio controls" class="absolute top-4 right-5 sm:right-8 z-40">
+<button class="flex items-center gap-2 px-4 py-2 rounded-full bg-brand-pineDark/90 border-2 border-brand-gold text-brand-goldGlow shadow-lg hover:brightness-125 transition-all cursor-pointer backdrop-blur-md" id="sound-toggle-btn">
+<span class="material-symbols-outlined text-lg" id="sound-icon">volume_up</span>
+<span class="text-xs font-black tracking-wider uppercase" id="sound-label">HANG: BE</span>
+</button>
+</aside>
+<!-- Top Hero Info Header -->
+<header class="w-full max-w-5xl mx-auto pt-5 pb-1 px-4 text-center z-10" data-purpose="header">
+<div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-rose/25 border border-brand-rose text-brand-goldGlow text-xs sm:text-sm font-extrabold tracking-widest uppercase mb-2 shadow-sm">
+<span class="inline-block w-2.5 h-2.5 rounded-full bg-brand-gold animate-ping"></span>
+      100% GARANTÁLT AJÁNDÉK · MINDEN PÖRGETÉS NYER!
+    </div>
+<h1 class="font-display text-4xl sm:text-5xl md:text-6xl text-brand-goldGlow tracking-wider drop-shadow-[0_4px_16px_rgba(229,169,60,0.6)]">
+      NAKED NOBLE
+    </h1>
+<h2 class="text-2xl sm:text-3xl md:text-4xl font-black text-brand-cream mt-0.5 tracking-tight flex items-center justify-center gap-3">
+<span class="text-brand-gold drop-shadow">★</span>
+<span>PÖRGESS ÉS NYERJ!</span>
+<span class="text-brand-gold drop-shadow">★</span>
+</h2>
+<p class="max-w-2xl mx-auto text-xs sm:text-sm text-brand-cream/80 font-medium mt-1 leading-snug">
+      Húzd meg a jobb oldali mechanikus kart vagy nyomd meg az arany gombot, és vidd el a prémium vegán és mentes kézműves finomságokat!
+    </p>
+</header>
+<!-- MAIN ARCADE CABINET STAGE -->
+<main class="w-full max-w-6xl mx-auto px-2 sm:px-4 py-2 flex flex-col items-center justify-center relative z-10" data-purpose="game-stage"><div class="flex flex-col w-full h-[calc(100vh-1.5rem)] max-h-screen overflow-hidden select-none relative justify-between">
+<!-- TOP HUD: Minimalist Arcade Marquee -->
+<header class="w-full flex items-center justify-between px-4 sm:px-8 py-2 z-20 flex-shrink-0">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-secondary flex items-center justify-center text-on-secondary shadow-md">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<div>
+<span class="font-headline-sm text-headline-sm text-tertiary-fixed-dim uppercase tracking-wider block leading-none">Naked Noble</span>
+<span class="font-label-sm text-label-sm text-surface-bright/70 uppercase tracking-widest">100% Garantált Nyeremény</span>
+</div>
+</div>
+<!-- Center Playful Callout Tag -->
+<div class="hidden sm:inline-flex items-center gap-2 px-5 py-1.5 rounded-full bg-primary-container/30 backdrop-blur-md shadow-sm">
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary-fixed-dim animate-pulse"></span>
+<span class="font-label-lg text-label-lg text-surface-bright tracking-wide">MINDEN PÖRGETÉS NYER!</span>
+</div>
+<!-- Sound Pill -->
+<button class="flex items-center gap-2 px-4 py-2 rounded-full bg-surface-container-lowest/10 hover:bg-surface-container-lowest/20 backdrop-blur-md text-surface-bright transition-all cursor-pointer" id="nn-audio-toggle" type="button">
+<span class="material-symbols-outlined text-lg" id="nn-audio-icon">volume_up</span>
+<span class="font-label-md text-label-md" id="nn-audio-label">HANG: BE</span>
+</button>
+</header>
+<!-- IMMERSIVE FULL-BLEED REEL STAGE -->
+<section class="flex-1 w-full max-w-7xl mx-auto px-2 sm:px-6 py-1 flex items-center justify-center relative min-h-0">
+<!-- Central Stage Box with Full Screen Ratio -->
+<div class="w-full h-full max-h-[72vh] flex items-center justify-center relative rounded-3xl overflow-hidden shadow-2xl bg-surface-container-lowest/5 backdrop-blur-sm">
+<!-- Ambient Backlight Halo -->
+<div class="absolute -inset-10 bg-gradient-to-r from-primary/20 via-tertiary-fixed-dim/20 to-secondary/20 blur-3xl pointer-events-none opacity-60"></div>
+<!-- Center Laser Win-line Indicator (Horizontally across center) -->
+<div class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-44 sm:h-52 z-20 pointer-events-none flex items-center justify-between px-2">
+<!-- Left Pointer Arrow -->
+<div class="flex items-center gap-1">
+<div class="w-4 h-9 bg-tertiary-fixed-dim rounded-r-full shadow-lg flex items-center justify-center animate-pulse">
+<span class="material-symbols-outlined text-on-tertiary-fixed text-xs font-black">arrow_forward_ios</span>
+</div>
+<span class="hidden md:inline font-label-sm text-label-sm uppercase tracking-widest text-tertiary-fixed-dim font-bold bg-on-background/70 px-2 py-0.5 rounded-md">NYERŐ VONAL</span>
+</div>
+<!-- Center Glowing Laser Ray -->
+<div class="flex-1 mx-2 h-1 bg-gradient-to-r from-transparent via-tertiary-fixed-dim to-transparent opacity-85 shadow-[0_0_15px_#fcbb3d]"></div>
+<!-- Right Pointer Arrow -->
+<div class="flex items-center gap-1">
+<span class="hidden md:inline font-label-sm text-label-sm uppercase tracking-widest text-tertiary-fixed-dim font-bold bg-on-background/70 px-2 py-0.5 rounded-md">NYERŐ VONAL</span>
+<div class="w-4 h-9 bg-tertiary-fixed-dim rounded-l-full shadow-lg flex items-center justify-center animate-pulse">
+<span class="material-symbols-outlined text-on-tertiary-fixed text-xs font-black">arrow_back_ios</span>
+</div>
+</div>
+</div>
+<!-- Glass Vignette & Depth Reflections -->
+<div class="absolute inset-0 z-10 pointer-events-none shadow-[inset_0_40px_60px_-10px_rgba(13,40,36,0.9),inset_0_-40px_60px_-10px_rgba(13,40,36,0.9)] rounded-3xl"></div>
+<!-- 3 GIANT REEL COLUMNS -->
+<div class="grid grid-cols-3 gap-2 sm:gap-4 w-full h-full p-2 sm:p-4 z-0">
+<!-- REEL 1 -->
+<div class="h-full bg-surface rounded-2xl overflow-hidden relative shadow-inner">
+<div class="w-full flex flex-col items-center will-change-transform" id="nn-strip-1">
+<!-- Dynamically populated -->
+</div>
+</div>
+<!-- REEL 2 -->
+<div class="h-full bg-surface rounded-2xl overflow-hidden relative shadow-inner">
+<div class="w-full flex flex-col items-center will-change-transform" id="nn-strip-2">
+<!-- Dynamically populated -->
+</div>
+</div>
+<!-- REEL 3 -->
+<div class="h-full bg-surface rounded-2xl overflow-hidden relative shadow-inner">
+<div class="w-full flex flex-col items-center will-change-transform" id="nn-strip-3">
+<!-- Dynamically populated -->
+</div>
+</div>
+</div>
+<!-- FLOATING RETRO ARCADE LEVER (Desktop & Tablet) -->
+<div class="hidden lg:flex absolute -right-5 xl:-right-10 top-1/2 -translate-y-1/2 z-30 flex-col items-center cursor-pointer group" id="nn-lever-assembly" title="Húzd meg a kart!">
+<!-- Lever Base Box -->
+<div class="w-8 h-32 rounded-xl bg-surface-container-high shadow-xl flex flex-col items-center justify-center p-1 relative">
+<!-- Track Slot -->
+<div class="w-3 h-24 bg-on-background/60 rounded-full shadow-inner relative flex justify-center">
+<!-- Pullable Arm -->
+<div class="w-4 h-28 bg-gradient-to-t from-outline-variant to-surface-bright rounded-full absolute -top-8 origin-bottom transition-transform duration-200 shadow-md flex flex-col items-center" id="nn-lever-arm">
+<!-- Ball Knob -->
+<div class="w-12 h-12 -mt-6 rounded-full bg-primary hover:bg-primary-container shadow-2xl flex items-center justify-center text-on-primary group-hover:scale-110 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-2xl">swipe_down</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- BOTTOM ARCADE CONTROLS DOCK -->
+<footer class="w-full max-w-4xl mx-auto px-4 pb-4 pt-1 flex flex-col sm:flex-row items-center justify-between gap-3 z-20 flex-shrink-0">
+<!-- Ticker Status Pill -->
+<div class="flex items-center gap-2.5 px-4 py-2 rounded-full bg-surface-container-lowest/10 backdrop-blur-md text-surface-bright">
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary-fixed-dim"></span>
+<span class="font-label-md text-label-md uppercase tracking-wider text-surface-bright font-bold" id="nn-status-text">
+        Húzd meg a kart vagy érintsd a gombot!
+      </span>
+</div>
+<!-- Monumental Glow Action Button -->
+<button class="w-full sm:w-auto px-10 py-4 rounded-full bg-tertiary-fixed-dim hover:brightness-110 text-on-tertiary-fixed font-headline-sm text-headline-sm uppercase tracking-widest shadow-2xl transition-all duration-150 transform hover:-translate-y-0.5 active:translate-y-1 cursor-pointer flex items-center justify-center gap-3" id="nn-spin-trigger" type="button">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">bolt</span>
+<span>PÖRGÉS!</span>
+</button>
+</footer>
+<!-- MINIMAL WINNER POPUP MODAL -->
+<div class="fixed inset-0 z-50 bg-on-background/80 backdrop-blur-md flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300" id="nn-win-overlay">
+<div class="bg-surface text-on-surface rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl transform scale-90 transition-transform duration-300 flex flex-col items-center text-center relative overflow-hidden" id="nn-win-card">
+<!-- Top Pill -->
+<div class="px-4 py-1 rounded-full bg-tertiary-fixed-dim text-on-tertiary-fixed font-label-md text-label-md uppercase tracking-widest mb-3">
+        100% GARANTÁLT NYEREMÉNY!
+      </div>
+<h3 class="font-headline-lg text-headline-lg text-primary tracking-tight leading-none mb-1">
+        NYERTÉL!
+      </h3>
+<h4 class="font-title-md text-title-md text-secondary font-bold mb-4" id="nn-win-name">
+        Prémium Krémes Finomság
+      </h4>
+<!-- Product Showcase Frame -->
+<div class="w-48 h-48 bg-surface-container-low rounded-2xl p-4 flex items-center justify-center shadow-inner mb-4">
+<img alt="Nyeremény termék" class="max-h-full max-w-full object-contain drop-shadow-md" id="nn-win-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCiDZZG8IAv9CFemjXp7N6qB7z0cYaHqZAQH_sUgbDV3pZ1Of6NIKmKW4jqTMeqDXFJNIoF4vlMVcf0eNE6P5WTVsmRRTe5LrN0v3kD994D5F_QxLa9wp3zFHHHWY0cw06Dtga5BhJD2k3hcne5FHhEtm0HBug9ud_2xb09e2hx1EYj46LU3fQLEeerq5D4rs_aZIT78vPVFs53yIGbekiWcn8Z9Xd3bVAbGa6KKkcWBigVvW9KY42yN7IkyT7Fa6Si-g"/>
+</div>
+<!-- Quick Redeem Note -->
+<div class="w-full py-2.5 px-4 rounded-2xl bg-surface-container text-on-surface-variant font-label-md text-label-md mb-6">
+        Mutasd fel ezt a képernyőt a pultnál a beváltáshoz!
+      </div>
+<!-- Restart Button -->
+<button class="w-full py-3.5 rounded-full bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg uppercase tracking-wider shadow-lg transition-transform active:scale-95 cursor-pointer" id="nn-win-dismiss" type="button">
+        Új játékos / Új pörgetés
+      </button>
+</div>
+</div>
+</div>
+<script>
+(function() {
+  // Guaranteed visual prize categories mapped directly to provided images
+  const PRIZES = [
+    {
+      id: 'cream',
+      title: 'Kézműves Magkrém Különlegesség',
+      img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCiDZZG8IAv9CFemjXp7N6qB7z0cYaHqZAQH_sUgbDV3pZ1Of6NIKmKW4jqTMeqDXFJNIoF4vlMVcf0eNE6P5WTVsmRRTe5LrN0v3kD994D5F_QxLa9wp3zFHHHWY0cw06Dtga5BhJD2k3hcne5FHhEtm0HBug9ud_2xb09e2hx1EYj46LU3fQLEeerq5D4rs_aZIT78vPVFs53yIGbekiWcn8Z9Xd3bVAbGa6KKkcWBigVvW9KY42yN7IkyT7Fa6Si-g',
+      pool: ['https://lh3.googleusercontent.com/aida-public/AB6AXuCiDZZG8IAv9CFemjXp7N6qB7z0cYaHqZAQH_sUgbDV3pZ1Of6NIKmKW4jqTMeqDXFJNIoF4vlMVcf0eNE6P5WTVsmRRTe5LrN0v3kD994D5F_QxLa9wp3zFHHHWY0cw06Dtga5BhJD2k3hcne5FHhEtm0HBug9ud_2xb09e2hx1EYj46LU3fQLEeerq5D4rs_aZIT78vPVFs53yIGbekiWcn8Z9Xd3bVAbGa6KKkcWBigVvW9KY42yN7IkyT7Fa6Si-g', 'https://lh3.googleusercontent.com/aida-public/AB6AXuCSyVe1efHe4WC9H-5nGVvWY_Ci_Gkxzqv-u5Oc5s_PNULL8SEH2B8-mbdNwZNJPmLqtJewgN5Z4nly4JjwFEUI3RReF946ieNh7g8apAEwk6xqSx7rUo2rG62L5mowF8njnLI_tA3YANeMcWti89LnUNPQznyB3CDOe2B4WpO0fC67dMOItIKQzDG7WesMaH1rCd5F16ajqUAjijDrPdCFw5yWbJIIJ29jX2ysJOBZUH8cS0OzBNiO8ud66QQcjTvT4A', 'https://lh3.googleusercontent.com/aida-public/AB6AXuBbxNtgBxi0GvyTBfHp7rSumEGNI8PoyqbOKC_xkfroLZ5guEq37XeqwsVRl4QAGSr6hqBQHfBmsz3mm0vVU9bX2BY2E7B24xBsYfEPhWHY9WGRlyQgtYx2RWdUz3mQDxSFD6f3VDhAEnrzfIOAHTRhDnGVtuCVnmFoapJc7jqWrpesFEhne8y0bhr7G3tOAyM9S5GV-HmUuzF1XKDpUs6mJrzamshh-FJZ5N7OsYuN8bM5cwAe2AXJjdWr2L61ngKMcg']
+    },
+    {
+      id: 'cookie',
+      title: 'Ropogós Mentes Zabkeksz',
+      img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCgxlk_gbZ49uydgDhJs3YaZD_WUO5h-hZ6syfE64OxIM_BJ8c14zcSvHJY5Zus5X07qTGwGUYUonz_JuSaiJgn_iRwJeUrJCF-soLD7jqZvgijBTGmvBvvqV3wA0bCVOgVwvESblQvpBO2IHfxO-jQj8U6H0UOlrr1LL08rybziKPJofyAxKo_BcmQVLgeIMxu5Joiyzsq50JxsXZrR6mpTQlTkyeDcwDlp_52hdsUVm9W1ShbKbqVPCk-aveBaPWc8Q',
+      pool: ['https://lh3.googleusercontent.com/aida-public/AB6AXuCgxlk_gbZ49uydgDhJs3YaZD_WUO5h-hZ6syfE64OxIM_BJ8c14zcSvHJY5Zus5X07qTGwGUYUonz_JuSaiJgn_iRwJeUrJCF-soLD7jqZvgijBTGmvBvvqV3wA0bCVOgVwvESblQvpBO2IHfxO-jQj8U6H0UOlrr1LL08rybziKPJofyAxKo_BcmQVLgeIMxu5Joiyzsq50JxsXZrR6mpTQlTkyeDcwDlp_52hdsUVm9W1ShbKbqVPCk-aveBaPWc8Q', 'https://lh3.googleusercontent.com/aida-public/AB6AXuC5VQPSdS_-MaPMrjYYbrLxHIxjch3YKU0LF_zLHTZwYI2p9Y2K8HNeu7aBLQayJ_wdAJObWHFLGo3Oh4ypnrIqO5JNtoXLcqE7dFIm6xm87Nt2tJG1xiksUi5URZj5Fjfb68Y1_-kbDoDAFnZLqkNK3H9BVgQkWmRdnxaOyFXiW6OxlcEPT2N8g-NGEfHCO6tahLqvuTD3OuFJYvJtjk914IaCQpLjgq33aEkGGTyzja2ufsdx62mXPFl1EU5d2xickA', 'https://lh3.googleusercontent.com/aida-public/AB6AXuB5krwVKpJB6VnzuGpd2LKqNjRm-yf9XsV5DvwjFnr-kUvC4qhEjKhWSkUK_a5s0fJ6uP7oJd-FZeIfBZznSQk_J0bbNZtyJNX6zK843f76y63UAO2dwd48kTYsVaQmQq9Xk0KcSsK3lujU5SU5994D8YveH-2Mtku3BhWR9gC60pS21xpPUG-zqMa5UGlGr9wc0qUg3nwziP5jYVk4NkO7eCB-RLWXUKYd1Ib4fH5WeLMjcoVEy5hfosMWWoD6v68UiQ']
+    },
+    {
+      id: 'megabox',
+      title: 'Naked Noble Mega Kóstoló Csomag',
+      img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBbxNtgBxi0GvyTBfHp7rSumEGNI8PoyqbOKC_xkfroLZ5guEq37XeqwsVRl4QAGSr6hqBQHfBmsz3mm0vVU9bX2BY2E7B24xBsYfEPhWHY9WGRlyQgtYx2RWdUz3mQDxSFD6f3VDhAEnrzfIOAHTRhDnGVtuCVnmFoapJc7jqWrpesFEhne8y0bhr7G3tOAyM9S5GV-HmUuzF1XKDpUs6mJrzamshh-FJZ5N7OsYuN8bM5cwAe2AXJjdWr2L61ngKMcg',
+      pool: ['https://lh3.googleusercontent.com/aida-public/AB6AXuCiDZZG8IAv9CFemjXp7N6qB7z0cYaHqZAQH_sUgbDV3pZ1Of6NIKmKW4jqTMeqDXFJNIoF4vlMVcf0eNE6P5WTVsmRRTe5LrN0v3kD994D5F_QxLa9wp3zFHHHWY0cw06Dtga5BhJD2k3hcne5FHhEtm0HBug9ud_2xb09e2hx1EYj46LU3fQLEeerq5D4rs_aZIT78vPVFs53yIGbekiWcn8Z9Xd3bVAbGa6KKkcWBigVvW9KY42yN7IkyT7Fa6Si-g', 'https://lh3.googleusercontent.com/aida-public/AB6AXuCgxlk_gbZ49uydgDhJs3YaZD_WUO5h-hZ6syfE64OxIM_BJ8c14zcSvHJY5Zus5X07qTGwGUYUonz_JuSaiJgn_iRwJeUrJCF-soLD7jqZvgijBTGmvBvvqV3wA0bCVOgVwvESblQvpBO2IHfxO-jQj8U6H0UOlrr1LL08rybziKPJofyAxKo_BcmQVLgeIMxu5Joiyzsq50JxsXZrR6mpTQlTkyeDcwDlp_52hdsUVm9W1ShbKbqVPCk-aveBaPWc8Q', 'https://lh3.googleusercontent.com/aida-public/AB6AXuBbxNtgBxi0GvyTBfHp7rSumEGNI8PoyqbOKC_xkfroLZ5guEq37XeqwsVRl4QAGSr6hqBQHfBmsz3mm0vVU9bX2BY2E7B24xBsYfEPhWHY9WGRlyQgtYx2RWdUz3mQDxSFD6f3VDhAEnrzfIOAHTRhDnGVtuCVnmFoapJc7jqWrpesFEhne8y0bhr7G3tOAyM9S5GV-HmUuzF1XKDpUs6mJrzamshh-FJZ5N7OsYuN8bM5cwAe2AXJjdWr2L61ngKMcg']
+    }
+  ];
+
+  // Synthesizer Web Audio API
+  let audioCtx = null;
+  let audioEnabled = true;
+
+  function initAudio() {
+    if (!audioCtx) {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (AudioContext) audioCtx = new AudioContext();
+    }
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+  }
+
+  function playTick() {
+    if (!audioEnabled || !audioCtx) return;
+    try {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(520 + Math.random() * 80, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.18, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.05);
+    } catch(e) {}
+  }
+
+  function playClunk() {
+    if (!audioEnabled || !audioCtx) return;
+    try {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(160, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.2);
+      gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.2);
+    } catch(e) {}
+  }
+
+  function playFanfare() {
+    if (!audioEnabled || !audioCtx) return;
+    try {
+      const freqs = [523.25, 659.25, 783.99, 1046.50];
+      freqs.forEach((freq, idx) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime + (idx * 0.1));
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime + (idx * 0.1));
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + (idx * 0.1) + 0.5);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(audioCtx.currentTime + (idx * 0.1));
+        osc.stop(audioCtx.currentTime + (idx * 0.1) + 0.5);
+      });
+    } catch(e) {}
+  }
+
+  // Audio Toggle
+  const audioToggle = document.getElementById('nn-audio-toggle');
+  const audioIcon = document.getElementById('nn-audio-icon');
+  const audioLabel = document.getElementById('nn-audio-label');
+  audioToggle.addEventListener('click', () => {
+    initAudio();
+    audioEnabled = !audioEnabled;
+    audioIcon.textContent = audioEnabled ? 'volume_up' : 'volume_off';
+    audioLabel.textContent = audioEnabled ? 'HANG: BE' : 'HANG: KI';
+  });
+
+  // DOM Elements
+  const strips = [
+    document.getElementById('nn-strip-1'),
+    document.getElementById('nn-strip-2'),
+    document.getElementById('nn-strip-3')
+  ];
+  const spinBtn = document.getElementById('nn-spin-trigger');
+  const leverAssembly = document.getElementById('nn-lever-assembly');
+  const leverArm = document.getElementById('nn-lever-arm');
+  const statusText = document.getElementById('nn-status-text');
+  const winOverlay = document.getElementById('nn-win-overlay');
+  const winCard = document.getElementById('nn-win-card');
+  const winName = document.getElementById('nn-win-name');
+  const winImg = document.getElementById('nn-win-img');
+  const winDismiss = document.getElementById('nn-win-dismiss');
+
+  // Strip Geometry Setup
+  const ITEM_HEIGHT = 180; // px
+  const STRIP_COUNT = 30;
+  let isSpinning = false;
+
+  function buildReels() {
+    strips.forEach((strip, stripIdx) => {
+      strip.innerHTML = '';
+      for (let i = 0; i < STRIP_COUNT; i++) {
+        const prizeType = PRIZES[i % PRIZES.length];
+        const imgSrc = prizeType.pool[stripIdx % prizeType.pool.length];
+
+        const card = document.createElement('div');
+        card.style.height = ITEM_HEIGHT + 'px';
+        card.className = 'w-full flex items-center justify-center p-3 flex-shrink-0';
+        card.innerHTML = `
+          <div class="w-full h-full flex flex-col items-center justify-center p-2 rounded-xl transition-all">
+            <img src="${imgSrc}" alt="${prizeType.title}" class="max-h-28 sm:max-h-36 max-w-[85%] object-contain drop-shadow-lg pointer-events-none">
+          </div>
+        `;
+        strip.appendChild(card);
+      }
+    });
+  }
+
+  buildReels();
+
+  // Spin Logic
+  function executeSpin() {
+    if (isSpinning) return;
+    initAudio();
+    isSpinning = true;
+
+    playClunk();
+    if (leverArm) {
+      leverArm.style.transform = 'rotateX(55deg) translateY(40px)';
+      setTimeout(() => {
+        leverArm.style.transform = 'none';
+      }, 300);
+    }
+
+    statusText.textContent = '🎰 PÖRGÉS FOLYAMATBAN... 🎰';
+    spinBtn.disabled = true;
+    spinBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+    // Pick 1 winning index
+    const winningPrizeIndex = Math.floor(Math.random() * PRIZES.length);
+    const chosenPrize = PRIZES[winningPrizeIndex];
+
+    // Compute target offset
+    const targetCycle = STRIP_COUNT - 6;
+    const targetIndex = (Math.floor(targetCycle / PRIZES.length) * PRIZES.length) + winningPrizeIndex;
+    const targetY = targetIndex * ITEM_HEIGHT;
+
+    // Tick Sound Loop
+    const ticker = setInterval(playTick, 110);
+
+    // Staggered reels
+    strips.forEach((strip, idx) => {
+      const delay = idx * 260;
+      const duration = 2.0 + (idx * 0.4);
+
+      strip.style.transition = `transform ${duration}s cubic-bezier(0.12, 0.9, 0.18, 1)`;
+      setTimeout(() => {
+        strip.style.transform = `translateY(-${targetY}px)`;
+      }, delay);
+    });
+
+    const totalDuration = 2000 + (2 * 260) + 400;
+
+    setTimeout(() => {
+      clearInterval(ticker);
+      onVictory(chosenPrize);
+    }, totalDuration);
+  }
+
+  function onVictory(prize) {
+    playFanfare();
+    statusText.textContent = `🎉 NYERTÉL: ${prize.title.toUpperCase()}! 🎉`;
+
+    winName.textContent = prize.title;
+    winImg.src = prize.img;
+
+    winOverlay.classList.remove('opacity-0', 'pointer-events-none');
+    winCard.classList.remove('scale-90');
+    winCard.classList.add('scale-100');
+
+    isSpinning = false;
+    spinBtn.disabled = false;
+    spinBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+  }
+
+  function dismissVictory() {
+    winOverlay.classList.add('opacity-0', 'pointer-events-none');
+    winCard.classList.add('scale-90');
+    winCard.classList.remove('scale-100');
+    statusText.textContent = 'Húzd meg a kart vagy érintsd a gombot!';
+
+    strips.forEach(strip => {
+      strip.style.transition = 'none';
+      strip.style.transform = 'translateY(0px)';
+    });
+  }
+
+  // Bindings
+  spinBtn.addEventListener('click', executeSpin);
+  if (leverAssembly) leverAssembly.addEventListener('click', executeSpin);
+  winDismiss.addEventListener('click', dismissVictory);
+})();
+</script></main>
+<!-- 3 Guaranteed Prize Preview Cards Section -->
+<section class="w-full max-w-5xl mx-auto px-4 py-5" data-purpose="prize-tiers-guide">
+<div class="text-center mb-3">
+<h3 class="font-extrabold text-lg sm:text-xl text-brand-goldGlow tracking-tight">
+        A 3 Garantált Nyereménykategória
+      </h3>
+<p class="text-xs sm:text-sm text-brand-cream/70 font-medium">Bármit is pörgetsz, a 3 egyforma kép után azonnal a tiéd az adott ajándékcsomag!</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+<!-- Prize 1: Magkrémek -->
+<article class="bg-[#17433c] rounded-2xl p-3.5 border-2 border-brand-rose/40 shadow-md flex items-center gap-3.5 transition-all hover:border-brand-gold hover:shadow-xl">
+<img alt="Naked Noble Kókuszos Mandulakrém" class="w-16 h-16 object-contain rounded-xl bg-white p-1 border border-brand-rose/20 shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSnbfe2XJckiisHbg5N90yYcR-AGHZsd1HD34J8SJxEcT5pcSaCsXDWuCf57dz9UrSELD0do7f4nvNZvIFC0CcpEKeKmCm8jdMCdTm4DS0uCLiLTlki0WKIAU6Xe9xcYpC_vPsrjFVCHhH_UCG4RpTXjIS8WoOG46zX42zOWhtdcW1pJQJ0rbgUUjU9A2aDWiabcZz4sRk5H6nbfp9xnxSCoyvFBsDGJ7KMkaBeSKiFjsDCfKBoASFDDBKo79WZgkIuQ"/>
+<div>
+<span class="text-[10px] font-black bg-brand-rose text-white px-2 py-0.5 rounded-full uppercase tracking-wider">1. Nyeremény</span>
+<h4 class="font-bold text-sm sm:text-base text-brand-cream">Krémes Finomság</h4>
+<p class="text-xs text-brand-cream/70">Ínycsiklandó gyümölcs- vagy magkrém hozzáadott cukor nélkül.</p>
+</div>
+</article>
+<!-- Prize 2: Kekszek -->
+<article class="bg-[#17433c] rounded-2xl p-3.5 border-2 border-brand-rose/40 shadow-md flex items-center gap-3.5 transition-all hover:border-brand-gold hover:shadow-xl">
+<img alt="Naked Noble Keksz" class="w-16 h-16 object-contain rounded-xl bg-white p-1 border border-brand-rose/20 shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBmCRHXY5HkbUqYkcyhpvJaNKlml9juSQyVmgIZZzNDvvi3X8koJ0qaGBDqE8UOUMQ3wLez7ImyHxIG_5Xn_4OeQRx3DoVgjIzO3EQZCjxjH3qwFM8Jj_v3ojLpglAwF6MlR3zyIZD_E5yYZ5Z8o5EMzrxBo6AhXlUdwghxzhCL7124b_npGpRWVrEpPlhC1uX8orf4O0CKwKa-7K0Wzf1sbXHQ_akBVoeWTzTa-Z7AyF9-4BZSGXuApL24l3V5uYTFw"/>
+<div>
+<span class="text-[10px] font-black bg-emerald-700 text-white px-2 py-0.5 rounded-full uppercase tracking-wider">2. Nyeremény</span>
+<h4 class="font-bold text-sm sm:text-base text-brand-cream">Ropogós Zabkeksz</h4>
+<p class="text-xs text-brand-cream/70">Gluténmentes, szójamentes vegán keksz élménycsomag.</p>
+</div>
+</article>
+<!-- Prize 3: Mega Box -->
+<article class="bg-[#17433c] rounded-2xl p-3.5 border-2 border-brand-rose/40 shadow-md flex items-center gap-3.5 transition-all hover:border-brand-gold hover:shadow-xl">
+<img alt="Naked Noble Eperkrém Válogatás" class="w-16 h-16 object-contain rounded-xl bg-white p-1 border border-brand-rose/20 shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvB7TEW5ZbmQouIJmqMiFtl-_UkOeaM4JjCPjPlDIcYaSVeYV5EBwVCSCaRUqJx-LlelZqNUAdgSURWTdj2JVZFDgJSjWIYgjR6LcJMAhvMkeRx_IoXq0ywyjPADkQQY2WYUd041lVl8C1_UsjXNLq2om5bZFjx3-Tsui0W9PIa-3IyDqGeP1FZ46ChX37gnl3Pnwu0Xi7NjQ94a6ibZg03QRtILEynFkqMoDC7494Yr0OAmATh6E5lJsP300TbeDQLQ"/>
+<div>
+<span class="text-[10px] font-black bg-amber-600 text-white px-2 py-0.5 rounded-full uppercase tracking-wider">3. Nyeremény</span>
+<h4 class="font-bold text-sm sm:text-base text-brand-cream">Naked Noble Mega Box</h4>
+<p class="text-xs text-brand-cream/70">Kombinált nagy kóstolócsomag krémekkel és ropogós kekszekkel.</p>
+</div>
+</article>
+</div>
+</section>
+<!-- Footer Disclaimer -->
+<footer class="w-full text-center py-4 text-brand-cream/50 text-xs" data-purpose="footer-info">
+    © Naked Noble. Minden jog fenntartva. Mentes finomságok kompromisszumok nélkül.
+  </footer>
+<!-- CELEBRATORY WINNER MODAL OVERLAY -->
+<div class="fixed inset-0 z-50 bg-[#071714]/85 backdrop-blur-md flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300" id="kiosk-win-modal">
+<div class="bg-gradient-to-b from-[#1b4e46] to-[#0e2c27] text-brand-cream rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-arcade-cabinet border-4 border-brand-gold flex flex-col items-center text-center transform scale-90 transition-transform duration-300 relative overflow-hidden" id="kiosk-win-card">
+<!-- Top festive tag -->
+<div class="inline-flex items-center gap-2 px-5 py-1.5 rounded-full arcade-gold-trim text-[#0d2824] font-black text-xs sm:text-sm uppercase tracking-wider mb-2 shadow-md">
+<span class="material-symbols-outlined text-base">celebration</span>
+<span>FANTASZTIKUS GARANTÁLT NYEREMÉNY!</span>
+</div>
+<h3 class="font-display text-3xl sm:text-4xl text-brand-goldGlow tracking-wider mt-1 drop-shadow-md">
+        GRATULÁLUNK, NYERTÉL!
+      </h3>
+<p class="text-lg sm:text-xl font-black text-white mt-1" id="kiosk-modal-title">
+        Krémes Finomságok Válogatás
+      </p>
+<!-- Winning Product Showcase Box -->
+<div class="w-48 h-48 my-4 p-4 rounded-2xl bg-white border-4 border-brand-gold shadow-2xl flex items-center justify-center">
+<img alt="Nyeremény" class="max-h-full max-w-full object-contain transform hover:scale-110 transition-transform" id="kiosk-modal-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSnbfe2XJckiisHbg5N90yYcR-AGHZsd1HD34J8SJxEcT5pcSaCsXDWuCf57dz9UrSELD0do7f4nvNZvIFC0CcpEKeKmCm8jdMCdTm4DS0uCLiLTlki0WKIAU6Xe9xcYpC_vPsrjFVCHhH_UCG4RpTXjIS8WoOG46zX42zOWhtdcW1pJQJ0rbgUUjU9A2aDWiabcZz4sRk5H6nbfp9xnxSCoyvFBsDGJ7KMkaBeSKiFjsDCfKBoASFDDBKo79WZgkIuQ"/>
+</div>
+<p class="text-sm text-brand-cream/90 max-w-md mb-4 font-medium" id="kiosk-modal-desc">
+        Egy teljes üveg organikus, hozzáadott cukor nélküli Naked Noble prémium finomság a tiéd!
+      </p>
+<!-- Voucher Code Box -->
+<div class="w-full max-w-xs p-3 rounded-2xl bg-[#091b17] border-2 border-brand-gold/60 flex items-center justify-between gap-3 mb-6 shadow-inner">
+<div class="text-left">
+<span class="block text-[10px] font-black text-brand-goldGlow uppercase">Ajándékkódod:</span>
+<span class="font-headline-sm text-base sm:text-lg text-white tracking-widest font-mono font-black" id="kiosk-modal-code">NOBLE-KREM-100</span>
+</div>
+<button class="px-3.5 py-1.5 rounded-full arcade-gold-trim text-[#0d2824] font-black text-xs uppercase hover:brightness-115 transition-all cursor-pointer shadow" id="kiosk-copy-btn">
+          Másolás
+        </button>
+</div>
+<!-- Action Button to Reset Kiosk -->
+<button class="w-full py-4 rounded-full bg-brand-rose hover:bg-brand-roseDeep text-white font-black text-base uppercase tracking-wider shadow-lg transition-all duration-150 transform active:scale-95 cursor-pointer border-2 border-white/40" id="kiosk-reset-btn">
+        KÖVETKEZŐ JÁTÉKOS / ÚJ PÖRGETÉS
+      </button>
+</div>
+</div>
+<!-- GAME CONTROLLER & AUDIO SYNTH SCRIPT -->
+<script>
+  (function() {
+    // 3 Guaranteed Prize Tiers mapped to brand product images
+    const KIOSK_PRIZES = [
+      {
+        id: 'cream',
+        title: 'Krémes Finomságok Csomag',
+        description: 'Egy teljes üveg hozzáadott cukormentes krémes vegán finomság a Naked Noble műhelyéből!',
+        code: 'NOBLE-KREM-100',
+        images: [
+          'https://lh3.googleusercontent.com/aida-public/AB6AXuBSnbfe2XJckiisHbg5N90yYcR-AGHZsd1HD34J8SJxEcT5pcSaCsXDWuCf57dz9UrSELD0do7f4nvNZvIFC0CcpEKeKmCm8jdMCdTm4DS0uCLiLTlki0WKIAU6Xe9xcYpC_vPsrjFVCHhH_UCG4RpTXjIS8WoOG46zX42zOWhtdcW1pJQJ0rbgUUjU9A2aDWiabcZz4sRk5H6nbfp9xnxSCoyvFBsDGJ7KMkaBeSKiFjsDCfKBoASFDDBKo79WZgkIuQ', // Kókuszos Mandulakrém
+          'https://lh3.googleusercontent.com/aida-public/AB6AXuDLb9Uqt1orm-5Ei6FnwywffLrPSoEKhIOKj4We8lcoevLoVTB6F7f37ASTo_Et9S9g5MN_-kcG-orT7dYoG55iikuEqQxev0SDkJzsWgN6z37D1plaT3OkeWjTnsunRlCM54k8jCaRiopkiyNCH2ad3RV6nWdCkbZkR_0sPz2BxUtsRXXZ5RxYS5q3za5euFICuZtwVZRpNx-1kLioqZ42w1T-u199AxEDU8nOXBmEe79PN-hdqpnaeFoXfyB-erQvYQ', // Banánkrém
+          'https://lh3.googleusercontent.com/aida-public/AB6AXuCvB7TEW5ZbmQouIJmqMiFtl-_UkOeaM4JjCPjPlDIcYaSVeYV5EBwVCSCaRUqJx-LlelZqNUAdgSURWTdj2JVZFDgJSjWIYgjR6LcJMAhvMkeRx_IoXq0ywyjPADkQQY2WYUd041lVl8C1_UsjXNLq2om5bZFjx3-Tsui0W9PIa-3IyDqGeP1FZ46ChX37gnl3Pnwu0Xi7NjQ94a6ibZg03QRtILEynFkqMoDC7494Yr0OAmATh6E5lJsP300TbeDQLQ'  // Eperkrém
+        ]
+      },
+      {
+        id: 'cookie',
+        title: 'Ropogós Mentes Zabkekszek',
+        description: 'Kézműves gluténmentes, természetes alapanyagokból készült ropogós zabkeksz élmény!',
+        code: 'NOBLE-KEKSZ-100',
+        images: [
+          'https://lh3.googleusercontent.com/aida-public/AB6AXuCBmCRHXY5HkbUqYkcyhpvJaNKlml9juSQyVmgIZZzNDvvi3X8koJ0qaGBDqE8UOUMQ3wLez7ImyHxIG_5Xn_4OeQRx3DoVgjIzO3EQZCjxjH3qwFM8Jj_v3ojLpglAwF6MlR3zyIZD_E5yYZ5Z8o5EMzrxBo6AhXlUdwghxzhCL7124b_npGpRWVrEpPlhC1uX8orf4O0CKwKa-7K0Wzf1sbXHQ_akBVoeWTzTa-Z7AyF9-4BZSGXuApL24l3V5uYTFw', // Zabkeksz
+          'https://lh3.googleusercontent.com/aida-public/AB6AXuBjVbFrKThypXYsg1cQz7kbWS_CjnxqqWadaQs_aebjhCFJsYEN5drbQZ0IbzSPHw7aufX1x4le1i_Esx3Y1Z-VN3-0QO19qPXLOpZbV6WjNcge1Jd5a1o3Z_rwC0tnY8KEIVrG0I12oayEVDnEkO8y8gBYuti-UgT3vC_m3bSlkZS14glXrkwaXykU_yziut7OTjY92c6YpNg0bRLXAdj8xl_QU0EfYuMavFxFPoLEGax02hU48qf0TpEAgKPtp1psyA', // Gyömbéres Keksz
+          'https://lh3.googleusercontent.com/aida-public/AB6AXuAburo6977OkHs3KKZMBmtIMlJeVafi37MM0eqLYkey4R1pfnkKcGhowz4a-GN4nnltdNLHsHt4KCWJoLVI_Np95xET9PEcTugAppVdSiiq5M8GUR0_M-C7rER_smP3UOxym5kdUOpw5GUWz-1-9aSnLu-iTSPeLlW32XQsdqEyDS4avDQsFeTxF9BrEJNuXcVnXuwauWXugksv7SqdxBD_umIC8Z8vlg2ld2wh2P91ePZlQIe7LZCU5sDETYMYFKHxWQ', // Kakaós-narancsos
+          'https://lh3.googleusercontent.com/aida-public/AB6AXuBf6Zgsgsbtn4coL__G9vWocaKTONl0CUq7diIrEJxa0BLaT83WAxWwd-Vd37qpyRq0q1frinlHQT9jf0qFmjicci6HkZtVhe9t8doKTVvoJDQLrkD1zln2BRRMtqWjN7iMg_uULeWbViKYjQn6l9B7cpwD_niPAoKFJ5lvnr8l8BakUiZvQKYz-yxlAquG9BNgnv00nAjP5kAwvObMEvNtFQdC3NFEJg4KljELaAFr_tFqq9HeJQiDZP2vugUqZ8m3bA'  // Mandulás Keksz
+        ]
+      },
+      {
+        id: 'megabox',
+        title: 'Naked Noble Kézműves Mega Box',
+        description: 'A legnagyobb válogatás: prémium magkrémek és ropogós kekszek díszdobozos harmóniája!',
+        code: 'NOBLE-MEGABOX-100',
+        images: [
+          'https://lh3.googleusercontent.com/aida-public/AB6AXuBSnbfe2XJckiisHbg5N90yYcR-AGHZsd1HD34J8SJxEcT5pcSaCsXDWuCf57dz9UrSELD0do7f4nvNZvIFC0CcpEKeKmCm8jdMCdTm4DS0uCLiLTlki0WKIAU6Xe9xcYpC_vPsrjFVCHhH_UCG4RpTXjIS8WoOG46zX42zOWhtdcW1pJQJ0rbgUUjU9A2aDWiabcZz4sRk5H6nbfp9xnxSCoyvFBsDGJ7KMkaBeSKiFjsDCfKBoASFDDBKo79WZgkIuQ',
+          'https://lh3.googleusercontent.com/aida-public/AB6AXuCBmCRHXY5HkbUqYkcyhpvJaNKlml9juSQyVmgIZZzNDvvi3X8koJ0qaGBDqE8UOUMQ3wLez7ImyHxIG_5Xn_4OeQRx3DoVgjIzO3EQZCjxjH3qwFM8Jj_v3ojLpglAwF6MlR3zyIZD_E5yYZ5Z8o5EMzrxBo6AhXlUdwghxzhCL7124b_npGpRWVrEpPlhC1uX8orf4O0CKwKa-7K0Wzf1sbXHQ_akBVoeWTzTa-Z7AyF9-4BZSGXuApL24l3V5uYTFw',
+          'https://lh3.googleusercontent.com/aida-public/AB6AXuCvB7TEW5ZbmQouIJmqMiFtl-_UkOeaM4JjCPjPlDIcYaSVeYV5EBwVCSCaRUqJx-LlelZqNUAdgSURWTdj2JVZFDgJSjWIYgjR6LcJMAhvMkeRx_IoXq0ywyjPADkQQY2WYUd041lVl8C1_UsjXNLq2om5bZFjx3-Tsui0W9PIa-3IyDqGeP1FZ46ChX37gnl3Pnwu0Xi7NjQ94a6ibZg03QRtILEynFkqMoDC7494Yr0OAmATh6E5lJsP300TbeDQLQ'
+        ]
+      }
+    ];
+
+    // Web Audio Engine
+    let audioCtx = null;
+    let soundEnabled = true;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) {
+          audioCtx = new AudioContext();
+        }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playClunk() {
+      if (!soundEnabled || !audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(140, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.18);
+      gain.gain.setValueAtTime(0.7, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.18);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.18);
+    }
+
+    function playTick(freq = 460) {
+      if (!soundEnabled || !audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.06);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.06);
+    }
+
+    function playWinFanfare() {
+      if (!soundEnabled || !audioCtx) return;
+      const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51]; // C5, E5, G5, C6, E6
+      notes.forEach((freq, idx) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime + (idx * 0.12));
+        gain.gain.setValueAtTime(0.4, audioCtx.currentTime + (idx * 0.12));
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + (idx * 0.12) + 0.6);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(audioCtx.currentTime + (idx * 0.12));
+        osc.stop(audioCtx.currentTime + (idx * 0.12) + 0.6);
+      });
+    }
+
+    // Sound Toggle Button
+    const soundToggleBtn = document.getElementById('sound-toggle-btn');
+    const soundIcon = document.getElementById('sound-icon');
+    const soundLabel = document.getElementById('sound-label');
+
+    soundToggleBtn.addEventListener('click', () => {
+      initAudio();
+      soundEnabled = !soundEnabled;
+      if (soundEnabled) {
+        soundIcon.textContent = 'volume_up';
+        soundLabel.textContent = 'HANG: BE';
+      } else {
+        soundIcon.textContent = 'volume_off';
+        soundLabel.textContent = 'HANG: KI';
+      }
+    });
+
+    // Elements
+    const reel1 = document.getElementById('kiosk-reel-1');
+    const reel2 = document.getElementById('kiosk-reel-2');
+    const reel3 = document.getElementById('kiosk-reel-3');
+    const reels = [reel1, reel2, reel3];
+
+    const leverTrigger = document.getElementById('kiosk-lever-trigger');
+    const leverArm = document.getElementById('kiosk-lever-arm');
+    const spinBtn = document.getElementById('kiosk-spin-btn');
+    const statusTicker = document.getElementById('kiosk-status-ticker');
+
+    const winModal = document.getElementById('kiosk-win-modal');
+    const winCard = document.getElementById('kiosk-win-card');
+    const modalTitle = document.getElementById('kiosk-modal-title');
+    const modalDesc = document.getElementById('kiosk-modal-desc');
+    const modalImg = document.getElementById('kiosk-modal-img');
+    const modalCode = document.getElementById('kiosk-modal-code');
+    const copyBtn = document.getElementById('kiosk-copy-btn');
+    const resetBtn = document.getElementById('kiosk-reset-btn');
+
+    // Strip Physics Config
+    const CARD_HEIGHT = 160; 
+    const STRIP_LENGTH = 27;
+    let isSpinning = false;
+
+    function populateReelStrips() {
+      reels.forEach((reel, rIdx) => {
+        reel.innerHTML = '';
+        for (let i = 0; i < STRIP_LENGTH; i++) {
+          const prizeCategory = KIOSK_PRIZES[i % KIOSK_PRIZES.length];
+          const imgUrl = prizeCategory.images[rIdx % prizeCategory.images.length];
+
+          const card = document.createElement('div');
+          card.className = 'w-full h-40 flex flex-col items-center justify-center p-2 sm:p-3 flex-shrink-0 select-none';
+          card.innerHTML = `
+            <div class="w-full h-full bg-white rounded-2xl shadow-md border-2 border-brand-gold/30 flex flex-col items-center justify-center p-2.5 transform transition-transform hover:scale-[1.02]">
+              <img src="${imgUrl}" alt="${prizeCategory.title}" class="max-h-24 sm:max-h-28 w-auto object-contain pointer-events-none drop-shadow-md">
+              <span class="text-xs sm:text-sm font-extrabold text-[#17433c] mt-1 text-center truncate w-full tracking-tight">${prizeCategory.title}</span>
+            </div>
+          `;
+          reel.appendChild(card);
+        }
+      });
+    }
+
+    populateReelStrips();
+
+    // Confetti Engine
+    const confettiCanvas = document.getElementById('kiosk-confetti-canvas');
+    const ctx = confettiCanvas.getContext('2d');
+    let confettiAnimationId = null;
+    let particles = [];
+    const brandColors = ['#e5a93c', '#f3c969', '#c27d88', '#17433c', '#fdf9f2', '#ff4d6d'];
+
+    function resizeCanvas() {
+      confettiCanvas.width = window.innerWidth;
+      confettiCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function spawnConfetti() {
+      particles = [];
+      const count = 180;
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: confettiCanvas.width / 2 + (Math.random() - 0.5) * 400,
+          y: confettiCanvas.height / 3 + (Math.random() - 0.5) * 150,
+          size: Math.random() * 10 + 6,
+          color: brandColors[Math.floor(Math.random() * brandColors.length)],
+          vx: (Math.random() - 0.5) * 20,
+          vy: Math.random() * -16 - 8,
+          gravity: 0.45,
+          rotation: Math.random() * 360,
+          rotSpeed: (Math.random() - 0.5) * 14,
+          alpha: 1
+        });
+      }
+    }
+
+    function renderConfetti() {
+      ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+      let activeCount = 0;
+
+      particles.forEach(p => {
+        p.vy += p.gravity;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rotation += p.rotSpeed;
+        p.alpha -= 0.005;
+
+        if (p.alpha > 0) {
+          activeCount++;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rotation * Math.PI) / 180);
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = Math.max(p.alpha, 0);
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.75);
+          ctx.restore();
+        }
+      });
+
+      if (activeCount > 0) {
+        confettiAnimationId = requestAnimationFrame(renderConfetti);
+      } else {
+        ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+      }
+    }
+
+    function triggerConfettiBurst() {
+      cancelAnimationFrame(confettiAnimationId);
+      resizeCanvas();
+      spawnConfetti();
+      renderConfetti();
+    }
+
+    function stopConfetti() {
+      cancelAnimationFrame(confettiAnimationId);
+      ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+    }
+
+    // Spin Execution with Guaranteed 3-Matching Win
+    function performSpin() {
+      if (isSpinning) return;
+      initAudio();
+      isSpinning = true;
+
+      // Sound & Mechanical Arm Dip
+      playClunk();
+      leverArm.classList.add('pulled');
+      setTimeout(() => {
+        leverArm.classList.remove('pulled');
+      }, 340);
+
+      // Status ticker
+      statusTicker.textContent = '🎰 PÖRGÉS FOLYAMATBAN... BIZTOS NYEREMÉNY ÉRKEZIK! 🎰';
+      spinBtn.disabled = true;
+      spinBtn.classList.add('opacity-60', 'cursor-not-allowed');
+
+      // Pick 1 guaranteed prize
+      const winningPrizeIndex = Math.floor(Math.random() * KIOSK_PRIZES.length);
+      const chosenPrize = KIOSK_PRIZES[winningPrizeIndex];
+
+      // Match target index near end of strip
+      const targetCycle = STRIP_LENGTH - 5;
+      const targetItemIndex = (Math.floor(targetCycle / KIOSK_PRIZES.length) * KIOSK_PRIZES.length) + winningPrizeIndex;
+      const targetOffset = targetItemIndex * CARD_HEIGHT;
+
+      // Periodic Reel Ticking
+      const tickInterval = setInterval(() => {
+        playTick(480 + Math.random() * 250);
+      }, 100);
+
+      // Staggered stop for dramatic effect
+      reels.forEach((reel, idx) => {
+        const delay = idx * 280;
+        const duration = 2.4 + (idx * 0.4);
+
+        reel.style.transition = `transform ${duration}s cubic-bezier(0.1, 0.88, 0.2, 1)`;
+        setTimeout(() => {
+          reel.style.transform = `translateY(-${targetOffset}px)`;
+        }, delay);
+      });
+
+      const totalSpinDuration = 2400 + (2 * 280) + 400;
+
+      setTimeout(() => {
+        clearInterval(tickInterval);
+        handleVictory(chosenPrize);
+      }, totalSpinDuration);
+    }
+
+    function handleVictory(prize) {
+      playWinFanfare();
+      triggerConfettiBurst();
+
+      statusTicker.innerHTML = `🎉 NYERTÉL: <span class="text-white font-black">${prize.title.toUpperCase()}</span>! 🎉`;
+
+      // Fill modal details
+      modalTitle.textContent = prize.title;
+      modalDesc.textContent = prize.description;
+      modalImg.src = prize.images[0];
+      modalCode.textContent = prize.code;
+
+      winModal.classList.remove('opacity-0', 'pointer-events-none');
+      winCard.classList.remove('scale-90');
+      winCard.classList.add('scale-100');
+
+      isSpinning = false;
+      spinBtn.disabled = false;
+      spinBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+    }
+
+    function resetKiosk() {
+      winModal.classList.add('opacity-0', 'pointer-events-none');
+      winCard.classList.add('scale-90');
+      winCard.classList.remove('scale-100');
+      statusTicker.textContent = '⚡ KÉSZEN ÁLL! HÚZD MEG A KART VAGY ÉRINTSD A GOMBOT! ⚡';
+
+      reels.forEach(reel => {
+        reel.style.transition = 'none';
+        reel.style.transform = 'translateY(0px)';
+      });
+      stopConfetti();
+    }
+
+    // Event Listeners
+    leverTrigger.addEventListener('click', performSpin);
+    spinBtn.addEventListener('click', performSpin);
+    resetBtn.addEventListener('click', resetKiosk);
+
+    copyBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(modalCode.textContent).then(() => {
+        copyBtn.textContent = 'Másolva! ✓';
+        setTimeout(() => { copyBtn.textContent = 'Másolás'; }, 2000);
+      }).catch(() => {
+        copyBtn.textContent = 'OK!';
+      });
+    });
+
+  })();
+  </script>
+</body></html>
