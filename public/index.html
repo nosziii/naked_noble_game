@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <title>Naked Noble – Sweet Spin</title>
+  <title>Naked Noble – Nyereményjáték</title>
 
   <!-- Google Fonts: DM Serif Display & Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
   <style>
     :root {
@@ -20,6 +20,11 @@
       --color-background: #FFF8EF;
       --color-surface: #F5EBDD;
       --color-surface-white: #FFFFFF;
+
+      /* Red Start Button */
+      --color-red-btn: #D92626;
+      --color-red-btn-hover: #B81D1D;
+      --color-red-glow: rgba(217, 38, 38, 0.38);
 
       /* Accent */
       --color-rose: #D98F9D;
@@ -48,8 +53,7 @@
 
       /* Elevation */
       --shadow-card: 0 8px 28px rgba(38, 48, 39, 0.08);
-      --shadow-card-hover: 0 14px 34px rgba(38, 48, 39, 0.12);
-      --shadow-win-glow: 0 0 0 2px var(--color-gold), 0 12px 36px rgba(232, 185, 81, 0.38);
+      --shadow-win-glow: 0 0 0 2px var(--color-gold), 0 12px 36px rgba(232, 185, 81, 0.42);
       --shadow-button: 0 10px 24px rgba(23, 61, 54, 0.2);
       --shadow-modal: 0 24px 80px rgba(22, 42, 35, 0.24);
 
@@ -105,26 +109,25 @@
       right: -120px;
     }
 
-    /* Main Responsive App Shell */
-    .app-shell {
-      position: relative;
-      z-index: 1;
+    /* Top Bar (Always crisp and accessible on top) */
+    .top-bar {
+      position: fixed;
+      top: clamp(12px, 2.2vh, 24px);
+      left: 50%;
+      transform: translateX(-50%);
       width: 100%;
       max-width: 1320px;
-      height: 100dvh;
-      margin: 0 auto;
-      padding: clamp(12px, 2.2vh, 28px) clamp(16px, 3vw, 44px);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    /* Top Navigation Bar */
-    .top-bar {
+      padding: 0 clamp(16px, 3vw, 44px);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      flex-shrink: 0;
+      z-index: 40;
+      pointer-events: none;
+    }
+
+    .brand-pill,
+    .top-actions {
+      pointer-events: auto;
     }
 
     .brand-pill {
@@ -172,11 +175,36 @@
       transform: scale(0.95);
     }
 
+    /* Main Responsive App Shell (Faded when waiting for Red Start Button) */
+    .app-shell {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 1320px;
+      height: 100dvh;
+      margin: 0 auto;
+      padding: clamp(64px, 9vh, 92px) clamp(16px, 3vw, 44px) clamp(16px, 3vh, 32px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: opacity 420ms var(--ease-out),
+                  filter 420ms var(--ease-out),
+                  transform 420ms var(--ease-out);
+    }
+
+    /* Translucent / Faded Background State when Red Start Button is visible */
+    .app-shell.is-awaiting-start {
+      opacity: 0.28;
+      filter: blur(2.5px);
+      transform: scale(0.99);
+      pointer-events: none;
+    }
+
     /* Editorial Header Section */
     .hero-header {
       text-align: center;
       flex-shrink: 0;
-      margin: clamp(2px, 1vh, 12px) 0 clamp(6px, 1.5vh, 16px);
+      margin-bottom: clamp(8px, 1.8vh, 20px);
     }
 
     .hero-kicker {
@@ -207,7 +235,7 @@
     .game-board {
       background-color: var(--color-surface);
       border-radius: var(--radius-lg);
-      padding: clamp(12px, 2vh, 22px) clamp(12px, 2vw, 24px);
+      padding: clamp(14px, 2.2vh, 24px) clamp(14px, 2.2vw, 26px);
       box-shadow: var(--shadow-card);
       border: 1px solid var(--color-border);
       flex: 1;
@@ -215,7 +243,7 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: clamp(10px, 1.6vh, 16px);
+      gap: clamp(10px, 1.8vh, 18px);
     }
 
     /* Top & Bottom Muted Context Rows (Gift Placeholders) */
@@ -223,7 +251,7 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: clamp(10px, 1.8vw, 20px);
-      height: clamp(42px, 6.8vh, 66px);
+      height: clamp(44px, 7vh, 68px);
       flex-shrink: 0;
     }
 
@@ -272,14 +300,9 @@
                   border-color var(--duration-normal) var(--ease-out);
     }
 
-    .product-card:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-card-hover);
-    }
-
     /* Winning Golden Flash & Shimmer on Center Cards (Phase 1) */
     .product-card.winning-card {
-      border: 2px solid var(--color-gold);
+      border: 2.5px solid var(--color-gold);
       box-shadow: var(--shadow-win-glow);
       transform: translateY(-3px);
     }
@@ -291,8 +314,8 @@
       background: linear-gradient(
         115deg,
         transparent 20%,
-        rgba(255, 255, 255, 0.75) 45%,
-        rgba(232, 185, 81, 0.35) 50%,
+        rgba(255, 255, 255, 0.78) 45%,
+        rgba(232, 185, 81, 0.38) 50%,
         transparent 75%
       );
       transform: translateX(-130%);
@@ -331,12 +354,12 @@
       justify-content: space-between;
     }
 
-    /* Inner Soft Frame for Product Image */
+    /* Inner Frame for Product Image */
     .product-image-frame {
       width: 100%;
       flex: 1;
       min-height: 0;
-      background-color: #F8F6F2;
+      background-color: #FFFFFF;
       border: 1px solid #F0EAE1;
       border-radius: 14px;
       padding: clamp(8px, 1.5vh, 16px);
@@ -352,18 +375,12 @@
       width: auto;
       height: auto;
       object-fit: contain;
-      transition: transform var(--duration-normal) var(--ease-out);
-      filter: drop-shadow(0 6px 14px rgba(38, 48, 39, 0.08));
-    }
-
-    .product-card:hover .product-image-frame img {
-      transform: scale(1.03);
     }
 
     .product-name {
       margin-top: clamp(6px, 1.2vh, 12px);
-      font-size: clamp(13px, 1.2vw, 16px);
-      font-weight: 600;
+      font-size: clamp(13px, 1.25vw, 16px);
+      font-weight: 700;
       color: var(--color-primary);
       text-align: center;
       white-space: nowrap;
@@ -373,63 +390,75 @@
       flex-shrink: 0;
     }
 
-    /* Bottom CTA Area */
-    .cta-section {
-      flex-shrink: 0;
+    /* =====================================================================
+       FOREGROUND RED START BUTTON OVERLAY (A piros indítógomb felül)
+       ===================================================================== */
+    .start-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin-top: clamp(10px, 1.8vh, 20px);
+      justify-content: center;
+      padding: 24px;
+      opacity: 1;
+      pointer-events: auto;
+      transition: opacity 280ms var(--ease-out),
+                  transform 280ms var(--ease-out);
     }
 
-    .spin-button {
-      width: 100%;
-      max-width: 860px;
-      height: clamp(50px, 6.8vh, 64px);
+    .start-overlay.is-hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.92);
+    }
+
+    @keyframes redPulseHalo {
+      0%, 100% {
+        box-shadow:
+          0 18px 45px var(--color-red-glow),
+          0 0 0 0 rgba(217, 38, 38, 0.35),
+          inset 0 2px 4px rgba(255, 255, 255, 0.35);
+      }
+      50% {
+        box-shadow:
+          0 22px 55px rgba(217, 38, 38, 0.5),
+          0 0 0 18px rgba(217, 38, 38, 0),
+          inset 0 2px 4px rgba(255, 255, 255, 0.35);
+      }
+    }
+
+    .red-start-btn {
+      position: relative;
+      min-width: clamp(260px, 42vw, 420px);
+      padding: clamp(22px, 3.2vh, 30px) clamp(40px, 5vw, 64px);
       border-radius: var(--radius-pill);
-      background-color: var(--color-primary);
-      color: var(--color-text-inverse);
-      border: none;
+      background: linear-gradient(180deg, #EF3B3B 0%, var(--color-red-btn) 55%, #B91C1C 100%);
+      color: #FFFFFF;
+      border: 4px solid #FFF8EF;
       font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: clamp(15px, 1.4vw, 17px);
-      font-weight: 700;
-      letter-spacing: 0.06em;
+      font-size: clamp(22px, 2.8vw, 32px);
+      font-weight: 800;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
+      gap: 16px;
       cursor: pointer;
-      box-shadow: var(--shadow-button);
-      transition: background-color var(--duration-fast) var(--ease-out),
-                  transform var(--duration-fast) var(--ease-out),
-                  box-shadow var(--duration-fast) var(--ease-out);
+      animation: redPulseHalo 2.2s infinite ease-in-out;
+      transition: transform var(--duration-fast) var(--ease-out),
+                  filter var(--duration-fast) var(--ease-out);
     }
 
-    .spin-button:hover:not(:disabled) {
-      background-color: var(--color-primary-hover);
-      transform: translateY(-2px);
-      box-shadow: 0 14px 28px rgba(23, 61, 54, 0.25);
+    .red-start-btn:hover {
+      transform: translateY(-3px) scale(1.02);
+      filter: brightness(1.05);
     }
 
-    .spin-button:active:not(:disabled),
-    .spin-button.pressed {
-      transform: scale(0.975);
-    }
-
-    .spin-button:disabled {
-      opacity: 0.78;
-      cursor: default;
-    }
-
-    .spin-helper {
-      margin-top: clamp(6px, 1vh, 10px);
-      font-size: clamp(12px, 1.1vw, 14px);
-      font-weight: 400;
-      color: var(--color-text-secondary);
-      display: flex;
-      align-items: center;
-      gap: 5px;
+    .red-start-btn:active {
+      transform: scale(0.96);
     }
 
     /* Winner Modal Overlay (Phase 2 & 3) */
@@ -454,7 +483,7 @@
       pointer-events: auto;
     }
 
-    /* Subtle Restrained Confetti Layer (6-10 elements) */
+    /* Subtle Restrained Confetti Layer (8-10 elements) */
     .subtle-confetti-container {
       position: fixed;
       inset: 0;
@@ -474,7 +503,7 @@
       position: relative;
       z-index: 52;
       width: 100%;
-      max-width: 780px;
+      max-width: 760px;
       background-color: var(--color-background);
       border-radius: var(--radius-lg);
       box-shadow: var(--shadow-modal);
@@ -522,7 +551,7 @@
       border-radius: 22px;
       padding: clamp(18px, 3vh, 28px);
       margin: 0 auto clamp(18px, 3vh, 28px);
-      max-width: 600px;
+      max-width: 580px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -530,8 +559,8 @@
     }
 
     .modal-image-square {
-      width: clamp(150px, 22vh, 200px);
-      height: clamp(150px, 22vh, 200px);
+      width: clamp(160px, 24vh, 220px);
+      height: clamp(160px, 24vh, 220px);
       background-color: var(--color-surface-white);
       border: 1px solid #EFE8DC;
       border-radius: var(--radius-md);
@@ -546,12 +575,11 @@
       max-width: 100%;
       max-height: 100%;
       object-fit: contain;
-      filter: drop-shadow(0 8px 16px rgba(38, 48, 39, 0.12));
     }
 
     .modal-product-name {
       font-family: 'DM Serif Display', Georgia, serif;
-      font-size: clamp(22px, 2.8vw, 30px);
+      font-size: clamp(24px, 3vw, 34px);
       font-weight: 400;
       color: var(--color-primary);
       margin-bottom: 10px;
@@ -571,7 +599,7 @@
 
     .modal-cta-btn {
       width: 100%;
-      height: clamp(52px, 6.8vh, 62px);
+      height: clamp(54px, 7vh, 64px);
       border-radius: var(--radius-pill);
       background-color: var(--color-primary);
       color: var(--color-text-inverse);
@@ -600,23 +628,10 @@
       transform: scale(0.98);
     }
 
-    /* Info Popover Modal */
-    .info-modal-card {
-      position: relative;
-      z-index: 52;
-      width: 100%;
-      max-width: 520px;
-      background-color: var(--color-background);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-modal);
-      padding: 28px 32px;
-      text-align: left;
-    }
-
     /* Responsive adjustments for smaller mobile screens */
     @media (max-width: 640px) {
       .app-shell {
-        padding: 12px 12px;
+        padding: 64px 12px 14px;
       }
       .game-board {
         padding: 10px;
@@ -634,72 +649,68 @@
 </head>
 
 <body>
-  <!-- Main Application Container -->
-  <div class="app-shell">
+  <!-- Fixed Top Navigation Bar -->
+  <header class="top-bar">
+    <div class="brand-pill">NAKED NOBLE</div>
 
-    <!-- Top Header Bar -->
-    <header class="top-bar">
-      <div class="brand-pill">NAKED NOBLE</div>
+    <div class="top-actions">
+      <!-- Sound Toggle Button -->
+      <button
+        id="sound-btn"
+        type="button"
+        class="icon-btn"
+        title="Hang be- és kikapcsolása"
+        aria-label="Hang be- és kikapcsolása"
+      >
+        <svg id="sound-on-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+        </svg>
+        <svg id="sound-off-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <line x1="23" y1="9" x2="17" y2="15"></line>
+          <line x1="17" y1="9" x2="23" y2="15"></line>
+        </svg>
+      </button>
 
-      <div class="top-actions">
-        <!-- Sound Toggle Button -->
-        <button
-          id="sound-btn"
-          type="button"
-          class="icon-btn"
-          title="Hang be- és kikapcsolása"
-          aria-label="Hang be- és kikapcsolása"
-        >
-          <svg id="sound-on-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
-          </svg>
-          <svg id="sound-off-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
-            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-            <line x1="23" y1="9" x2="17" y2="15"></line>
-            <line x1="17" y1="9" x2="23" y2="15"></line>
-          </svg>
-        </button>
+      <!-- Fullscreen Toggle Button -->
+      <button
+        id="fullscreen-btn"
+        type="button"
+        class="icon-btn"
+        title="Teljes képernyő"
+        aria-label="Teljes képernyő"
+      >
+        <svg id="fs-enter-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+        </svg>
+        <svg id="fs-exit-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+          <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
 
-        <!-- Fullscreen Toggle Button -->
-        <button
-          id="fullscreen-btn"
-          type="button"
-          class="icon-btn"
-          title="Teljes képernyő"
-          aria-label="Teljes képernyő"
-        >
-          <svg id="fs-enter-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
-          </svg>
-          <svg id="fs-exit-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
-            <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path>
-          </svg>
-        </button>
+  <!-- FOREGROUND RED START BUTTON OVERLAY -->
+  <div id="start-overlay" class="start-overlay">
+    <button id="red-start-btn" type="button" class="red-start-btn">
+      <span>PÖRGETÉS</span>
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+        <polyline points="12 5 19 12 12 19"></polyline>
+      </svg>
+    </button>
+  </div>
 
-        <!-- Info / Rules Button (?) -->
-        <button
-          id="info-btn"
-          type="button"
-          class="icon-btn"
-          title="Játékszabály és nyeremények"
-          aria-label="Játékszabály és nyeremények"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-            <line x1="12" y1="17" x2="12.01" y2="17"></line>
-          </svg>
-        </button>
-      </div>
-    </header>
+  <!-- Main Application Container (Starts faded in background behind the Red Button) -->
+  <div id="app-shell" class="app-shell is-awaiting-start">
 
     <!-- Editorial Hero Title -->
     <section class="hero-header">
       <p class="hero-kicker">EGY KIS ÉDESSÉG, EGY NAGY MEGLEPETÉS</p>
       <h1 class="hero-title">Pörgesd ki a szerencséd!</h1>
-      <p class="hero-subtitle">Találj három egyforma finomságot!</p>
+      <p class="hero-subtitle">Találj három egyforma ajándékot!</p>
     </section>
 
     <!-- Center Game Board (#F5EBDD) -->
@@ -782,26 +793,6 @@
 
     </main>
 
-    <!-- Primary Spin Button & Helper -->
-    <footer class="cta-section">
-      <button id="spin-btn" type="button" class="spin-button">
-        <!-- Gold Sparkle SVG -->
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E8B951" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 3l1.9 5.8a2 2 0 0 0 1.3 1.3L21 12l-5.8 1.9a2 2 0 0 0-1.3 1.3L12 21l-1.9-5.8a2 2 0 0 0-1.3-1.3L3 12l5.8-1.9a2 2 0 0 0 1.3-1.3L12 3z"></path>
-          <path d="M5 3v4M3 5h4"></path>
-        </svg>
-        <span id="spin-btn-text">PÖRGETÉS</span>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="5" y1="12" x2="19" y2="12"></line>
-          <polyline points="12 5 19 12 12 19"></polyline>
-        </svg>
-      </button>
-      <p class="spin-helper">
-        <span>Sok szerencsét!</span>
-        <span style="color: var(--color-gold);">✨</span>
-      </p>
-    </footer>
-
   </div>
 
   <!-- Subtle Restrained Confetti Layer (8-10 elements) -->
@@ -827,15 +818,15 @@
       </div>
 
       <h2 id="modal-heading" class="modal-title">Ez édes siker!</h2>
-      <p class="modal-subtitle">Megnyerted az alábbi finomságot</p>
+      <p class="modal-subtitle">Megnyerted az alábbi ajándékot:</p>
 
       <!-- Showcase Card -->
       <div class="modal-prize-box">
         <div class="modal-image-square">
-          <img id="modal-prize-img" src="images/banankrem.png" alt="Megnyert termék" />
+          <img id="modal-prize-img" src="images/kedvezmeny-300.jpg" alt="Megnyert ajándék" />
         </div>
-        <h3 id="modal-prize-name" class="modal-product-name">Krémes finomság – Banánkrém</h3>
-        <span id="modal-prize-category" class="modal-category-pill">1. NYEREMÉNYKATEGÓRIA</span>
+        <h3 id="modal-prize-name" class="modal-product-name">300 Ft kedvezmény</h3>
+        <span id="modal-prize-category" class="modal-category-pill">GARANTÁLT NYEREMÉNY</span>
       </div>
 
       <!-- Next Player CTA -->
@@ -849,94 +840,85 @@
     </div>
   </div>
 
-  <!-- INFO / PRIZE CATEGORIES MODAL -->
-  <div
-    id="info-modal"
-    class="modal-overlay"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="info-heading"
-  >
-    <div class="info-modal-card">
-      <h2 id="info-heading" class="modal-title" style="font-size: 28px; margin-bottom: 10px;">
-        Naked Noble – Sweet Spin
-      </h2>
-      <p style="font-size: 14px; color: var(--color-text-secondary); line-height: 1.6; margin-bottom: 18px;">
-        Pörgess a <strong>Pörgetés</strong> gombbal (vagy a <strong>Space / Enter</strong> billentyűvel)! Ha három egyforma finomság jelenik meg a középső sorban, máris a tiéd az ajándék.
-      </p>
-      <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px;">
-        <div style="background: var(--color-surface); padding: 12px 16px; border-radius: 14px; font-size: 14px;">
-          <strong style="color: var(--color-primary);">1. Nyereménykategória:</strong> Krémes finomság (Banánkrém, Eperkrém, Kókuszos mandulakrém)
-        </div>
-        <div style="background: var(--color-surface); padding: 12px 16px; border-radius: 14px; font-size: 14px;">
-          <strong style="color: var(--color-primary);">2. Nyereménykategória:</strong> Ropogós keksz (Zabkeksz, Mandulás, Gyömbéres, Kakaós-narancsos)
-        </div>
-        <div style="background: var(--color-surface); padding: 12px 16px; border-radius: 14px; font-size: 14px;">
-          <strong style="color: var(--color-primary);">3. Nyereménykategória:</strong> Naked Noble Mega Box válogatás
-        </div>
-      </div>
-      <button id="close-info-btn" type="button" class="modal-cta-btn" style="height: 48px;">
-        BEZÁRÁS
-      </button>
-    </div>
-  </div>
-
   <script>
     (function () {
-      // Naked Noble Product Catalog with Prize Tiers
-      const PRODUCTS = [
+      // Exact Prize Pool & Probabilities (Total = 100%)
+      // 1. kép: Vászontáska – 4%
+      // 2. kép: 300 Ft kedvezmény – 51%
+      // 3. kép: Golyóstoll – 12%
+      // 4. kép: Fakanál – 12%
+      // 5. kép: Jojó – 9%
+      // 6. kép: Zsebtükör – 9%
+      // 7. kép: Karácsonyi sütiformaszett – 3%
+      const PRIZES = [
         {
-          id: 'kakaos-keksz',
-          name: 'Kakaós keksz',
-          categoryTitle: 'Ropogós keksz – Kakaós-narancsos',
-          categoryBadge: '2. NYEREMÉNYKATEGÓRIA',
-          image: 'images/kakaos-narancsos-keksz.png'
+          id: 'kedvezmeny-300',
+          name: '300 Ft kedvezmény',
+          badge: 'NAKED NOBLE AJÁNDÉK',
+          image: 'images/kedvezmeny-300.jpg',
+          weight: 51
         },
         {
-          id: 'banankrem',
-          name: 'Banánkrém',
-          categoryTitle: 'Krémes finomság – Banánkrém',
-          categoryBadge: '1. NYEREMÉNYKATEGÓRIA',
-          image: 'images/banankrem.png'
+          id: 'golyostoll',
+          name: 'Golyóstoll',
+          badge: 'NAKED NOBLE AJÁNDÉK',
+          image: 'images/golyostoll.png',
+          weight: 12
         },
         {
-          id: 'mandulas-keksz',
-          name: 'Mandulás keksz',
-          categoryTitle: 'Ropogós keksz – Mandulás keksz',
-          categoryBadge: '2. NYEREMÉNYKATEGÓRIA',
-          image: 'images/mandulas-keksz.png'
+          id: 'fakanal',
+          name: 'Fakanál',
+          badge: 'NAKED NOBLE AJÁNDÉK',
+          image: 'images/fakanal.jpg',
+          weight: 12
         },
         {
-          id: 'eperkrem',
-          name: 'Eperkrém',
-          categoryTitle: 'Krémes finomság – Eperkrém',
-          categoryBadge: '1. NYEREMÉNYKATEGÓRIA',
-          image: 'images/eperkrem.png'
+          id: 'jojo',
+          name: 'Jojó',
+          badge: 'NAKED NOBLE AJÁNDÉK',
+          image: 'images/jojo.jpg',
+          weight: 9
         },
         {
-          id: 'zabkeksz',
-          name: 'Ropogós zabkeksz',
-          categoryTitle: 'Ropogós keksz – Zabkeksz',
-          categoryBadge: '2. NYEREMÉNYKATEGÓRIA',
-          image: 'images/zabkeksz.png'
+          id: 'zsebtukor',
+          name: 'Zsebtükör',
+          badge: 'NAKED NOBLE AJÁNDÉK',
+          image: 'images/zsebtukor.jpg',
+          weight: 9
         },
         {
-          id: 'kokuszos-mandulakrem',
-          name: 'Kókuszos mandulakrém',
-          categoryTitle: 'Krémes finomság – Kókuszos mandulakrém',
-          categoryBadge: '1. NYEREMÉNYKATEGÓRIA',
-          image: 'images/kokuszos-mandulakrem.png'
+          id: 'vaszontaska',
+          name: 'Vászontáska',
+          badge: 'KIEMELT NYEREMÉNY',
+          image: 'images/vaszontaska.jpg',
+          weight: 4
         },
         {
-          id: 'gyomberes-keksz',
-          name: 'Gyömbéres keksz',
-          categoryTitle: 'Naked Noble Mega Box – Kézműves válogatás',
-          categoryBadge: '3. NYEREMÉNYKATEGÓRIA',
-          image: 'images/gyomberes-keksz.png'
+          id: 'sutiformaszett',
+          name: 'Karácsonyi sütiformaszett',
+          badge: 'KÜLÖNLEGES NYEREMÉNY',
+          image: 'images/sutiformaszett.jpg',
+          weight: 3
         }
       ];
 
+      // Weighted Random Selection
+      function pickWeightedPrize() {
+        const totalWeight = PRIZES.reduce((sum, p) => sum + p.weight, 0);
+        let rand = Math.random() * totalWeight;
+        for (let i = 0; i < PRIZES.length; i++) {
+          if (rand < PRIZES[i].weight) {
+            return PRIZES[i];
+          }
+          rand -= PRIZES[i].weight;
+        }
+        return PRIZES[0];
+      }
+
       // DOM Elements
+      const appShell = document.getElementById('app-shell');
+      const startOverlay = document.getElementById('start-overlay');
+      const redStartBtn = document.getElementById('red-start-btn');
       const gameBoard = document.getElementById('game-board');
       const cards = [
         document.getElementById('card-0'),
@@ -948,8 +930,6 @@
         document.getElementById('strip-1'),
         document.getElementById('strip-2')
       ];
-      const spinBtn = document.getElementById('spin-btn');
-      const spinBtnText = document.getElementById('spin-btn-text');
 
       const winnerModal = document.getElementById('winner-modal');
       const modalPrizeImg = document.getElementById('modal-prize-img');
@@ -964,11 +944,8 @@
       const fullscreenBtn = document.getElementById('fullscreen-btn');
       const fsEnterSvg = document.getElementById('fs-enter-svg');
       const fsExitSvg = document.getElementById('fs-exit-svg');
-      const infoBtn = document.getElementById('info-btn');
-      const infoModal = document.getElementById('info-modal');
-      const closeInfoBtn = document.getElementById('close-info-btn');
 
-      // Pleasant, Non-Casino Organic Web Audio Engine
+      // Pleasant Web Audio Engine
       let audioCtx = null;
       let soundEnabled = true;
 
@@ -984,27 +961,25 @@
         }
       }
 
-      // Soft warm wooden button click
       function playSoftClick() {
         if (!soundEnabled || !audioCtx) return;
         const now = audioCtx.currentTime;
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(320, now);
-        osc.frequency.exponentialRampToValueAtTime(140, now + 0.06);
-        gain.gain.setValueAtTime(0.2, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+        osc.frequency.setValueAtTime(340, now);
+        osc.frequency.exponentialRampToValueAtTime(150, now + 0.065);
+        gain.gain.setValueAtTime(0.22, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.065);
         osc.connect(gain);
         gain.connect(audioCtx.destination);
         osc.start(now);
-        osc.stop(now + 0.06);
+        osc.stop(now + 0.065);
       }
 
-      // Gentle marimba-like settle tone when each column stops
       function playColumnSettle(stepIndex) {
         if (!soundEnabled || !audioCtx) return;
-        const freqs = [392.0, 440.0, 523.25]; // G4, A4, C5
+        const freqs = [392.0, 440.0, 523.25];
         const now = audioCtx.currentTime;
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
@@ -1018,10 +993,9 @@
         osc.stop(now + 0.18);
       }
 
-      // Warm, elegant chime chord on win (no harsh arcade sirens)
       function playElegantWinChime() {
         if (!soundEnabled || !audioCtx) return;
-        const notes = [523.25, 659.25, 783.99, 1046.5]; // C5 major 7th / octave warm arpeggio
+        const notes = [523.25, 659.25, 783.99, 1046.5];
         notes.forEach((freq, idx) => {
           const start = audioCtx.currentTime + idx * 0.09;
           const osc = audioCtx.createOscillator();
@@ -1029,7 +1003,7 @@
           osc.type = 'sine';
           osc.frequency.setValueAtTime(freq, start);
           gain.gain.setValueAtTime(0.001, start);
-          gain.gain.linearRampToValueAtTime(0.2, start + 0.03);
+          gain.gain.linearRampToValueAtTime(0.22, start + 0.03);
           gain.gain.exponentialRampToValueAtTime(0.0008, start + 0.75);
           osc.connect(gain);
           gain.connect(audioCtx.destination);
@@ -1038,7 +1012,7 @@
         });
       }
 
-      // Top Controls Event Listeners
+      // Top Controls
       soundBtn.addEventListener('click', () => {
         initAudio();
         soundEnabled = !soundEnabled;
@@ -1062,41 +1036,25 @@
         fsExitSvg.style.display = isFs ? 'block' : 'none';
       });
 
-      infoBtn.addEventListener('click', () => {
-        infoModal.classList.add('is-open');
-        infoBtn.blur();
-      });
-
-      closeInfoBtn.addEventListener('click', () => {
-        infoModal.classList.remove('is-open');
-        closeInfoBtn.blur();
-      });
-
-      infoModal.addEventListener('click', (e) => {
-        if (e.target === infoModal) {
-          infoModal.classList.remove('is-open');
-        }
-      });
-
       // Reel Strip Setup & Rendering
       const STRIP_ITEMS = 18;
       const TARGET_STOP_INDEX = 15;
-      let isSpinning = false;
-      let currentDisplayedItems = [PRODUCTS[0], PRODUCTS[1], PRODUCTS[2]];
+      let gameState = 'idle'; // 'idle' | 'spinning' | 'won'
+      let currentDisplayedItems = [PRIZES[5], PRIZES[0], PRIZES[2]];
 
       function getCardHeight() {
         return cards[0].clientHeight;
       }
 
-      function createReelItemNode(product, heightPx) {
+      function createReelItemNode(prize, heightPx) {
         const item = document.createElement('div');
         item.className = 'reel-item';
         item.style.height = `${heightPx}px`;
         item.innerHTML = `
           <div class="product-image-frame">
-            <img src="${product.image}" alt="${product.name}" loading="eager" />
+            <img src="${prize.image}" alt="${prize.name}" loading="eager" />
           </div>
-          <div class="product-name">${product.name}</div>
+          <div class="product-name">${prize.name}</div>
         `;
         return item;
       }
@@ -1111,7 +1069,6 @@
         });
       }
 
-      // Initialize once layout is ready
       requestAnimationFrame(renderInitialReels);
 
       window.addEventListener('resize', () => {
@@ -1119,9 +1076,8 @@
         document.querySelectorAll('.reel-item').forEach((node) => {
           node.style.height = `${h}px`;
         });
-        if (!isSpinning) {
+        if (gameState !== 'spinning') {
           strips.forEach((strip) => {
-            // Keep resting at the currently visible item
             const itemCount = strip.children.length;
             const targetIdx = itemCount > 1 ? TARGET_STOP_INDEX : 0;
             strip.style.transition = 'none';
@@ -1130,7 +1086,7 @@
         }
       });
 
-      // Subtle Restrained Confetti (8-10 tasteful elements for Phase 2)
+      // Subtle Restrained Confetti (10 elements for Phase 2)
       function spawnSubtleConfetti() {
         confettiLayer.innerHTML = '';
         const palette = ['#E8B951', '#D98F9D', '#F4AD83', '#B7C5AC', '#173D36'];
@@ -1173,53 +1129,47 @@
         }
       }
 
-      // Spin Sequence with 3-Phase Celebration
+      // Start Spin: Hide Red Button -> Fade in Board -> Spin Reels -> Show Winner Modal
       function startSpin() {
-        if (isSpinning) return;
+        if (gameState !== 'idle') return;
         initAudio();
-        isSpinning = true;
+        gameState = 'spinning';
 
-        // Button press feedback
         playSoftClick();
-        spinBtn.classList.add('pressed');
-        setTimeout(() => spinBtn.classList.remove('pressed'), 160);
 
-        spinBtn.disabled = true;
-        spinBtnText.textContent = 'PÖRGETÉS...';
+        // Hide the Red Start Button and bring the Game Board to full opacity
+        startOverlay.classList.add('is-hidden');
+        appShell.classList.remove('is-awaiting-start');
         gameBoard.classList.add('is-spinning');
         cards.forEach((c) => c.classList.remove('winning-card'));
 
-        // Business logic: select the guaranteed winning product before animation starts
-        const winningProduct = PRODUCTS[Math.floor(Math.random() * PRODUCTS.length)];
+        // Weighted prize draw according to exact percentages
+        const winningPrize = pickWeightedPrize();
         const h = getCardHeight();
 
-        // Populate each column's strip:
-        // Index 0 = currently displayed item, Middle = random items, Index TARGET_STOP_INDEX = winningProduct
+        // Build reel strips
         strips.forEach((strip, colIdx) => {
           strip.innerHTML = '';
           strip.style.transition = 'none';
           strip.style.transform = 'translateY(0px)';
 
           for (let i = 0; i < STRIP_ITEMS; i++) {
-            let itemProd;
+            let itemPrize;
             if (i === 0) {
-              itemProd = currentDisplayedItems[colIdx];
+              itemPrize = currentDisplayedItems[colIdx];
             } else if (i === TARGET_STOP_INDEX) {
-              itemProd = winningProduct;
+              itemPrize = winningPrize;
             } else {
-              itemProd = PRODUCTS[(i * 2 + colIdx * 3 + Math.floor(Math.random() * PRODUCTS.length)) % PRODUCTS.length];
+              // Mix all 7 prizes visually during the spin
+              itemPrize = PRIZES[(i * 2 + colIdx * 3 + Math.floor(Math.random() * PRIZES.length)) % PRIZES.length];
             }
-            strip.appendChild(createReelItemNode(itemProd, h));
+            strip.appendChild(createReelItemNode(itemPrize, h));
           }
         });
 
-        // Update current items state to the new winner
-        currentDisplayedItems = [winningProduct, winningProduct, winningProduct];
-
-        // Force reflow before starting CSS transition
+        currentDisplayedItems = [winningPrize, winningPrize, winningPrize];
         void strips[0].offsetHeight;
 
-        // Staggered column spin (220ms difference between columns, ~2.1s - 2.55s total)
         const baseDurationMs = 1950;
         const staggerMs = 230;
 
@@ -1229,7 +1179,6 @@
           strip.style.transition = `transform ${colDuration}ms var(--ease-spring)`;
           strip.style.transform = `translateY(-${TARGET_STOP_INDEX * h}px)`;
 
-          // Remove motion blur slightly before settle & play gentle marimba settle sound
           setTimeout(() => {
             strip.classList.remove('motion-blur');
             playColumnSettle(colIdx);
@@ -1238,43 +1187,48 @@
 
         const totalSpinTime = baseDurationMs + 2 * staggerMs;
 
-        // PHASE 1: Spin stops -> Golden border & light shimmer on the 3 winning cards
+        // Phase 1: Highlight winning cards
         setTimeout(() => {
           gameBoard.classList.remove('is-spinning');
           cards.forEach((c) => c.classList.add('winning-card'));
           playElegantWinChime();
 
-          // PHASE 2 & 3: After brief golden highlight (550ms), dim background + 8-10 subtle confetti + fade/scale in modal
+          // Phase 2 & 3: Open Winner Modal
           setTimeout(() => {
-            showWinnerModal(winningProduct);
+            showWinnerModal(winningPrize);
           }, 550);
         }, totalSpinTime);
       }
 
-      function showWinnerModal(product) {
-        modalPrizeImg.src = product.image;
-        modalPrizeImg.alt = product.name;
-        modalPrizeName.textContent = product.categoryTitle;
-        modalPrizeCategory.textContent = product.categoryBadge;
+      function showWinnerModal(prize) {
+        modalPrizeImg.src = prize.image;
+        modalPrizeImg.alt = prize.name;
+        modalPrizeName.textContent = prize.name;
+        modalPrizeCategory.textContent = prize.badge;
 
         spawnSubtleConfetti();
         winnerModal.classList.add('is-open');
-
-        isSpinning = false;
-        spinBtn.disabled = false;
-        spinBtnText.textContent = 'PÖRGETÉS';
+        gameState = 'won';
       }
 
+      // Next Player: Close Winner Modal -> Fade Board -> Bring back Red Start Button on top
       function resetForNextPlayer() {
+        if (gameState !== 'won') return;
         playSoftClick();
+
         winnerModal.classList.remove('is-open');
         confettiLayer.innerHTML = '';
         cards.forEach((c) => c.classList.remove('winning-card'));
+
+        // Fade background board and show the Red Start Button again
+        appShell.classList.add('is-awaiting-start');
+        startOverlay.classList.remove('is-hidden');
+        gameState = 'idle';
       }
 
-      // Button Clicks
-      spinBtn.addEventListener('click', () => {
-        spinBtn.blur();
+      // Event Listeners
+      redStartBtn.addEventListener('click', () => {
+        redStartBtn.blur();
         startSpin();
       });
 
@@ -1283,28 +1237,20 @@
         resetForNextPlayer();
       });
 
-      // Keyboard Support (Space & Enter)
+      // Space & Enter Keyboard Support
       window.addEventListener('keydown', (e) => {
         if (e.code === 'Space' || e.code === 'Enter' || e.key === ' ' || e.key === 'Enter') {
           if (e.repeat) return;
           e.preventDefault();
 
-          if (infoModal.classList.contains('is-open')) {
-            infoModal.classList.remove('is-open');
-            return;
-          }
-
-          if (winnerModal.classList.contains('is-open')) {
-            resetForNextPlayer();
-          } else if (!isSpinning) {
+          if (gameState === 'idle') {
             startSpin();
+          } else if (gameState === 'won') {
+            resetForNextPlayer();
           }
-        } else if (e.key === 'Escape') {
-          infoModal.classList.remove('is-open');
         }
       });
     })();
   </script>
 </body>
 </html>
-

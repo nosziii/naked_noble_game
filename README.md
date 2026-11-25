@@ -9,7 +9,7 @@ docker compose up -d --build
 ```
 
 Ezután a játék elérhető a böngészőben:
-- **URL:** `http://localhost:8080`
+- **URL:** `http://localhost:8088`
 
 ## Irányítás
 - **Érintőképernyő / Egér:** Kattints a **„✨ PÖRGETÉS →”** gombra (nyerés után pedig a **„KÖVETKEZŐ JÁTÉKOS →”** gombra).
