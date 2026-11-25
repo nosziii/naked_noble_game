@@ -3,7 +3,7 @@ services:
     build: .
     container_name: nakednoble-slot-game
     ports:
-      - "8088:80"
+      - "9005:80"
     volumes:
       - ./public:/usr/share/nginx/html:ro
     restart: unless-stopped
