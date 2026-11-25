@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <defs>
+    <linearGradient id="forestGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E4E45" />
+      <stop offset="55%" stop-color="#173D36" />
+      <stop offset="100%" stop-color="#0F2924" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F7D77E" />
+      <stop offset="50%" stop-color="#E8B951" />
+      <stop offset="100%" stop-color="#C8962E" />
+    </linearGradient>
+    <linearGradient id="roseGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#D98F9D" />
+      <stop offset="100%" stop-color="#C47483" />
+    </linearGradient>
+    <filter id="cardShadow" x="-15%" y="-15%" width="130%" height="135%">
+      <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#173D36" flood-opacity="0.18" />
+    </filter>
+    <!-- Coupon ticket mask with side semicircular cutouts -->
+    <mask id="ticketMask">
+      <rect x="0" y="0" width="500" height="500" fill="white" />
+      <circle cx="42" cy="250" r="24" fill="black" />
+      <circle cx="458" cy="250" r="24" fill="black" />
+    </mask>
+  </defs>
+
+  <!-- Soft background halo circles -->
+  <circle cx="250" cy="250" r="205" fill="#FFF8EF" />
+  <circle cx="115" cy="115" r="18" fill="#F4AD83" opacity="0.25" />
+  <circle cx="395" cy="385" r="26" fill="#D98F9D" opacity="0.22" />
+  <circle cx="385" cy="110" r="10" fill="#E8B951" opacity="0.4" />
+  <circle cx="105" cy="380" r="14" fill="#B7C5AC" opacity="0.35" />
+
+  <!-- Decorative back ticket card (tilted slightly) -->
+  <g transform="rotate(-5 250 250)" opacity="0.85">
+    <rect x="52" y="120" width="396" height="260" rx="26" fill="url(#roseGrad)" />
+  </g>
+
+  <!-- Main Coupon Ticket Card -->
+  <g filter="url(#cardShadow)">
+    <g mask="url(#ticketMask)">
+      <!-- Main Deep Forest ticket body -->
+      <rect x="42" y="114" width="416" height="272" rx="26" fill="url(#forestGrad)" />
+
+      <!-- Subtle decorative warm glow inside ticket -->
+      <circle cx="250" cy="250" r="150" fill="#24564B" opacity="0.35" />
+
+      <!-- Inner gold dashed border -->
+      <rect x="62" y="132" width="376" height="236" rx="18" fill="none" stroke="url(#goldGrad)" stroke-width="2.5" stroke-dasharray="8 6" />
+    </g>
+  </g>
+
+  <!-- Gold rings around the ticket notches -->
+  <path d="M 42 226 A 24 24 0 0 1 42 274" fill="none" stroke="url(#goldGrad)" stroke-width="2.5" />
+  <path d="M 458 226 A 24 24 0 0 0 458 274" fill="none" stroke="url(#goldGrad)" stroke-width="2.5" />
+
+  <!-- Top Brand Pill -->
+  <rect x="165" y="150" width="170" height="32" rx="16" fill="#FFF8EF" />
+  <text x="250" y="171" text-anchor="middle" fill="#173D36" font-family="'Plus Jakarta Sans', 'Arial', sans-serif" font-size="14" font-weight="800" letter-spacing="3">
+    NAKED NOBLE ✻
+  </text>
+
+  <!-- Sparkle Left -->
+  <path d="M105 215 L109 227 L121 231 L109 235 L105 247 L101 235 L89 231 L101 227 Z" fill="url(#goldGrad)" />
+  <!-- Sparkle Right -->
+  <path d="M395 215 L399 227 L411 231 L399 235 L395 247 L391 235 L379 231 L391 227 Z" fill="url(#goldGrad)" />
+
+  <!-- Main Amount: 300 Ft -->
+  <text x="250" y="268" text-anchor="middle" fill="#FFF8EF" font-family="'DM Serif Display', 'Georgia', serif" font-size="86" font-weight="700" letter-spacing="1">
+    300 Ft
+  </text>
+
+  <!-- Bottom Golden Ribbon Badge: KEDVEZMÉNY -->
+  <rect x="135" y="294" width="230" height="44" rx="22" fill="url(#goldGrad)" />
+  <text x="250" y="322" text-anchor="middle" fill="#173D36" font-family="'Plus Jakarta Sans', 'Arial', sans-serif" font-size="19" font-weight="800" letter-spacing="3.5">
+    KEDVEZMÉNY
+  </text>
+</svg>
